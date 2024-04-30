@@ -1,0 +1,12 @@
+package components
+
+templ Index(name string) {
+	@DocType()
+	@Head()
+	@Body(pageIndex(name))
+}
+
+templ pageIndex(name string) {
+	<p>Hello Template!</p>
+	<p>My name is <span class="text-xl font-bold">{ name }</span></p>
+}

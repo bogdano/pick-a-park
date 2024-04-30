@@ -1,0 +1,27 @@
+[build]
+pre_cmd = ["templ generate","npx tailwindcss -i ./client/main.css -o ./pb_public/tailwind.css"]
+# It's not necessary to trigger build each time file changes if it's too frequent.
+delay = 1000
+
+cmd = "go build -o . ./main.go"
+
+# Delay after sending Interrupt signal
+kill_delay = 10
+
+# Binary file yields from `cmd`.
+bin = "./main"
+
+# Ignore these filename extensions or directories.
+exclude_regex =["_templ\\.go"]
+include_ext = ["templ", "go"]
+
+args_bin = ["serve"]
+
+
+[log]
+# Show log time
+time = true
+
+[misc]
+# Delete tmp directory on exit
+clean_on_exit = false

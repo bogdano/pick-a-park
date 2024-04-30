@@ -1,0 +1,18 @@
+package components
+
+templ DocType() {
+	<!DOCTYPE html>
+}
+
+templ Head() {
+	<head>
+		<link rel="stylesheet" href="/tailwind.css"/>
+		<script src="https://unpkg.com/htmx.org@2.0.0-beta1/dist/htmx.min.js"></script>
+	</head>
+}
+
+templ Body(component templ.Component) {
+	<body class="bg-white px-6 w-full flex flex-col relative">
+		@component
+	</body>
+}
