@@ -4,15 +4,20 @@ templ DocType() {
 	<!DOCTYPE html>
 }
 
-templ Head() {
+templ Head(title string) {
 	<head>
-		<link rel="stylesheet" href="/tailwind.css"/>
+		<link rel="stylesheet" href="/tailwind.css" />
 		<script src="https://unpkg.com/htmx.org@2.0.0-beta1/dist/htmx.min.js"></script>
+		<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet"/>
+		<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+		<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+		<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css" />
 	</head>
+	<title>{ title }</title>
 }
 
 templ Body(component templ.Component) {
-	<body class="bg-white px-6 w-full flex flex-col relative">
+	<body class="container relative min-h-screen">
 		@component
 	</body>
 }

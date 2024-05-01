@@ -1,0 +1,18 @@
+package components
+
+import (
+    "go-htmx/api"
+)
+ 
+templ Parks(parks []api.Park, placeName string) {
+    <div>
+        <h1>Parks near { placeName }</h1>
+        <ul>
+            for _, park := range parks {
+                <li>
+                    { park.FullName }
+                </li>
+            }
+        </ul>
+    </div>    
+}

@@ -1,18 +1,8 @@
-# Go starter template
+# Golang+HTMX+Pocketbase National Parks Finder App
 
 - Pocketbase
 - HTMX
-
-To starts run
-```
-air
-```
-
-Go to http://127.0.0.1:8090/hello/yourname
-
-## Prerequisites
-- [Air](https://github.com/cosmtrek/air)
-- Go
+- Tailwind CSS
 
 ## Todo
 **Auth**
