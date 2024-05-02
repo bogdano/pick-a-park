@@ -2,17 +2,20 @@ package components
 
 import (
     "go-htmx/api"
+    "fmt"
 )
  
-templ Parks(parks []api.Park, placeName string) {
-    <div>
-        <h1>Parks near { placeName }</h1>
-        <ul>
-            for _, park := range parks {
-                <li>
-                    { park.FullName }
-                </li>
-            }
-        </ul>
-    </div>    
+templ Parks(parks []api.Park, placeName string, collection_id string) {
+    <p class="font-bold">Parks near { placeName }</p>
+    <ul>
+        for _, park := range parks {
+            <li>
+                { park.FullName } { park.States }
+                <img src={ string(templ.URL(fmt.Sprintf("/api/files/%s/%s/%s", collection_id, park.ParkRecordId, park.Images[0])))} 
+                     alt="Park photo" 
+                     class="w-20 h-20 rounded-full"
+                     loading="lazy" />
+            </li>
+        }
+    </ul>
 }

@@ -42,7 +42,6 @@ func FetchDrivingDistances(startCoordinates [2]float64, parksData []Park) ([]Par
 	if err != nil {
 		return nil, err
 	}
-
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {

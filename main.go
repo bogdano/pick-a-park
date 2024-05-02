@@ -57,8 +57,11 @@ func main() {
 				var park api.Park
 				park.FullName = record.GetString("name")
 				park.Description = record.GetString("description")
+				park.States = record.GetString("states")
+				park.Images = record.Get("images").([]string)
 				park.Longitude = record.GetString("longitude")
 				park.Latitude = record.GetString("latitude")
+				park.ParkRecordId = record.Id
 				parks = append(parks, park)
 			}
 
@@ -67,15 +70,20 @@ func main() {
 			if err != nil {
 				return c.String(http.StatusInternalServerError, err.Error())
 			}
-			return template.Html(c, components.Parks(parks, placeName))
+			collection, err := app.Dao().FindCollectionByNameOrId("nationalParks")
+			if err != nil {
+				return c.String(http.StatusInternalServerError, err.Error())
+			}
+			collection_id := collection.Id
+			return template.Html(c, components.Parks(parks, placeName, collection_id))
 		})
 
-		// route to fetch parks, commented because Pocketbase scheduler is set up to fetch parks every day
-		// e.Router.GET("/fetchParks", api.FetchAndStoreNationalParks(app))
+		// route to fetch parks, commented because Pocketbase scheduler is set up to fetch parks every week
+		e.Router.GET("/fetchParks", api.FetchAndStoreNationalParks(app))
 
-		// Start a cron that fetches and stores National Parks data every day
+		// Start a cron that fetches and stores National Parks data once a week
 		scheduler := cron.New()
-		scheduler.MustAdd("updateParks", "0 1 * * *", func() {
+		scheduler.MustAdd("updateParks", "0 0 * * 0", func() {
 			api.FetchAndStoreNationalParks(app)
 		})
 		scheduler.Start()

@@ -11,7 +11,9 @@ templ pageIndex() {
 		<h1 class="text-4xl font-bold pt-12 mb-8">National Parks Near You:</h1>
 		<div id="geocoder" class="geocoder mb-8"></div>
 	</div>
-	<div id="parks-container" class="text-center font-bold text-stone-400">Please select your starting point!</div>
+	<div id="parks-container" class="text-center">
+		<span class="font-bold text-stone-400">Please select your starting point!</span>	
+	</div>
 
 	<script>
 		// Initialize Mapbox Geocoder
@@ -26,11 +28,10 @@ templ pageIndex() {
 		geocoder.on('result', function(e) {
 			var coords = e.result.geometry.coordinates;
 			var placeName = e.result.place_name;
-			console.log(coords);
 			// Use HTMX to send coordinates to the server and get parks
 			htmx.ajax('POST', '/fetch-parks', {
 				values: {longitude: coords[0], latitude: coords[1], placeName: placeName},
-				target: '#parks-container'
+				target: '#parks-container',
 			});
 		});
 	</script>
