@@ -9,17 +9,29 @@ templ Parks(parks []api.Park, placeName string, stateName string) {
     if len(parks) == 0 {
         <span class="font-bold text-stone-400">Please select your starting point!</span>
     } else {
-        <span class="font-bold">Parks near { placeName }</span>
+        <span class="font-bold text-xl text-stone-700">Parks near { placeName }, { stateName }</span>
     }
-    <ul>
+    <div class="w-full flex gap-2 md:gap-4 flex-wrap justify-center mt-8 mb-24">
         for _, park := range parks {
-            <li>
-                <a href={ templ.SafeURL(fmt.Sprintf("/park/%s", park.ParkCode)) }>{ park.FullName } { park.States } { park.DrivingDistance } { park.DriveTime }</a>
-                <img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/eop7kcada8abcp4/%s/%s", park.ParkRecordId, park.Images[0])))} 
-                     alt="Park photo" 
-                     class="w-20 h-20 rounded-full"
-                     loading="lazy" />
-            </li>
+            <a  href={ templ.SafeURL(fmt.Sprintf("/park/%s?q=%s,%s", park.ParkCode, placeName, stateName)) } 
+                class="block group rounded-xl shadow-md w-44 md:w-64 transition-all duration-300 ease-in-out hover:text-white hover:bg-lime-700">
+                <div class="flex flex-col">
+                    <div class="rounded-t-xl h-44 md:h-64 w-full bg-stone-200 overflow-hidden">
+                        <img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/eop7kcada8abcp4/%s/%s?thumb=500x500", park.ParkRecordId, park.Images[0])))} 
+                            alt="Park photo" 
+                            class="rounded-t-xl object-cover h-44 md:h-64 w-full transition-transform duration-300 ease-in-out transform group-hover:scale-105"
+                            loading="lazy" />
+                    </div>
+                    <div class="flex flex-col text-pretty px-2 py-4">
+                        <span class="font-bold text-lg">{ park.FullName }</span> 
+                        <span class="font-bold text-stone-500 group-hover:text-white">{ park.DrivingDistance } 
+                        if park.DrivingDistance != "ocean" {
+                            { ", " + park.DriveTime} 
+                        }</span>
+                    </div>
+                </div>
+            </a>
         }
-    </ul>
+    </div>
 }
+

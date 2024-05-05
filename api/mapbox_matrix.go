@@ -62,7 +62,7 @@ func FetchDrivingDistances(startCoordinates [2]float64, parksData []Park) ([]Par
 
 	// Attach driving distances to parks
 	for i := range parksData {
-		if response.Durations[0][i+1] == 0 {
+		if response.Durations[0][i+1] == 0.0 {
 			parksData[i].DriveTime = ""
 			parksData[i].DrivingDistance = "ocean"
 		} else {

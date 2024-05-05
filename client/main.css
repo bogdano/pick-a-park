@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes fade-in {
+    from { opacity: 0; }
+}
+
+@keyframes fade-out {
+    to { opacity: 0; }
+}
+
+/* define animations for the old and new content */
+::view-transition-old(smooth-fade) {
+    animation: 150ms linear both fade-out;
+}
+::view-transition-new(smooth-fade) {
+    animation: 150ms linear 30ms both fade-in;
+}
+  
+/* tie the view transition to a given CSS class */
+.htmx-body {
+    view-transition-name: smooth-fade;
+}
+
 @media (min-width: 768px) {
     .park-photo {
         height: 550px;
@@ -67,3 +88,8 @@
     cursor: not-allowed;
 }
   
+.sedan-sc-regular {
+    font-family: "Sedan SC", serif;
+    font-weight: 400;
+    font-style: normal;
+  }

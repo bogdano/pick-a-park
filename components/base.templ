@@ -6,6 +6,8 @@ templ DocType() {
 
 templ Head(title string) {
 	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" href="/tailwind.css" />
 		<script src="https://unpkg.com/htmx.org@2.0.0-beta1/dist/htmx.min.js"></script>
 		<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
@@ -16,12 +18,15 @@ templ Head(title string) {
 
 		<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" />
 		<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Sedan+SC&display=swap" rel="stylesheet" />
 	</head>
 	<title>{ title }</title>
 }
 
 templ Body(component templ.Component) {
-	<body class="htmx-body max-w-6xl mx-auto w-full min-h-lvh relative" hx-boost="true">
+	<body class="htmx-body max-w-6xl mx-auto w-full min-h-lvh relative" hx-boost="true" hx-swap="innerHTML transition:true">
 		@component
 	</body>
 }

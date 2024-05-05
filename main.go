@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"go-htmx/api"
 	"go-htmx/components"
 	"go-htmx/template"
@@ -40,25 +41,33 @@ func main() {
 		})
 
 		e.Router.GET("/park/:parkCode", func(c echo.Context) error {
-			parkCode := c.PathParam("parkCode")
+			parkCode := c.PathParam("parkCode") // use Param to get path parameters
 			queryName := c.QueryParam("q")
-			date := c.QueryParam("d")
-			log.Println("q: ", queryName)
-			log.Println("d: ", date)
 
-			placeRecord, err := app.Dao().FindFirstRecordByData("places", "placeName", queryName)
-			if err != nil {
-				return c.String(http.StatusInternalServerError, err.Error())
+			var placeRecord *models.Record
+			// Proceed only if queryName is provided
+			if queryName != "" {
+				var err error
+				placeRecord, err = app.Dao().FindFirstRecordByData("places", "placeName", queryName)
+				if err != nil {
+					return c.JSON(http.StatusBadRequest, map[string]string{"error": "Place not found"})
+				}
 			}
-			parkPlaceRecord, err := app.Dao().FindFirstRecordByData("placeParks", "place", placeRecord.Id)
-			if err != nil {
-				return c.String(http.StatusInternalServerError, err.Error())
+			var parkPlaceRecord *models.Record // Define outside to check later
+			// Proceed only if placeRecord is found
+			if placeRecord != nil {
+				var err error
+				parkPlaceRecord, err = app.Dao().FindFirstRecordByData("placeParks", "place", placeRecord.Id)
+				if err != nil {
+					return c.JSON(http.StatusBadRequest, map[string]string{"error": "Park not found"})
+				}
 			}
-			log.Println("place: ", parkPlaceRecord.GetString("place"))
-			// check if parkCode is already in collection "nationalParks" under field "parkCode"
-			parkRecord, _ := app.Dao().FindFirstRecordByData("nationalParks", "parkCode", parkCode)
+			// regardless of queryParams, proceed to fetch park data
+			parkRecord, err := app.Dao().FindFirstRecordByData("nationalParks", "parkCode", parkCode)
+			if err != nil {
+				return c.JSON(http.StatusNotFound, map[string]string{"error": "Park not found"})
+			}
 			if parkRecord != nil {
-				// return all info from DB
 				var park api.Park
 				park.FullName = parkRecord.GetString("name")
 				park.Description = parkRecord.GetString("description")
@@ -66,13 +75,33 @@ func main() {
 				park.Images = parkRecord.Get("images").([]string)
 				park.Longitude = parkRecord.GetString("longitude")
 				park.Latitude = parkRecord.GetString("latitude")
+				park.WeatherInfo = parkRecord.GetString("weatherInfo")
+				park.DirectionsInfo = parkRecord.GetString("directionsInfo")
 				park.ParkRecordId = parkRecord.Id
 				park.ParkCode = parkCode
-				park.DriveTime = parkPlaceRecord.GetString("driveTime")
-				park.DrivingDistance = parkPlaceRecord.GetString("drivingDistance")
-				return template.Html(c, components.Park(park, placeRecord.GetString("placeName"), date))
+				var weatherData []api.WeatherDate
+				err := json.Unmarshal([]byte(parkRecord.GetString("weather")), &weatherData)
+				if err != nil {
+					log.Println("Error unmarshaling JSON:", err)
+				}
+				park.Weather = weatherData
+				parkPlaceRecord, err = app.Dao().FindFirstRecordByData("placeParks", "park", parkRecord.Id)
+				if err != nil {
+					return c.JSON(http.StatusBadRequest, map[string]string{"error": "Park not found"})
+				}
+				if parkPlaceRecord != nil {
+					park.DriveTime = parkPlaceRecord.GetString("driveTime")
+					park.DrivingDistance = parkPlaceRecord.GetString("drivingDistance")
+				}
+
+				placeName := ""
+				if placeRecord != nil {
+					placeName = placeRecord.GetString("placeName")
+				}
+
+				return template.Html(c, components.Park(park, placeName))
 			} else {
-				// redirect to home page if park not found
+				// Redirect to home page if park not found
 				return c.Redirect(http.StatusFound, "/")
 			}
 		})
@@ -85,7 +114,7 @@ func main() {
 			placeRecord, _ := app.Dao().FindFirstRecordByData("places", "placeName", queryName)
 			if placeRecord != nil {
 				// get the parks associated with the place
-				placeParks, err := app.Dao().FindRecordsByExpr("placeParks", dbx.HashExp{"place": placeRecord.Id}) ////////
+				placeParks, err := app.Dao().FindRecordsByExpr("placeParks", dbx.HashExp{"place": placeRecord.Id})
 				if err != nil {
 					return err
 				}
@@ -182,11 +211,21 @@ func main() {
 
 		// route to fetch parks, commented because Pocketbase scheduler is set up to fetch parks every week
 		e.Router.GET("/update-park-data", api.FetchAndStoreNationalParks(app))
+		// route to fetch weather data
+		e.Router.GET("/update-weather-data", api.FetchAndStoreWeather(app))
 
 		// Start a cron that fetches and stores National Parks data once a week
 		scheduler := cron.New()
 		scheduler.MustAdd("updateParks", "0 0 * * 0", func() {
+			log.Println("Fetching and storing National Parks data...")
 			api.FetchAndStoreNationalParks(app)
+			log.Println("National Parks data fetched and stored!")
+		})
+		// update weather data every 4 hours
+		scheduler.MustAdd("updateWeather", "0 */4 * * *", func() {
+			log.Println("Fetching and storing weather data...")
+			api.FetchAndStoreWeather(app)
+			log.Println("Weather data fetched and stored!")
 		})
 		scheduler.Start()
 		return nil

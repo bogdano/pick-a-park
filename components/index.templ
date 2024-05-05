@@ -11,8 +11,8 @@ templ Index(parks []api.Park, placeName string, state string) {
 }
 
 templ pageIndex(parks []api.Park, placeName string, state string) {
-	<div class="flex flex-col items-center mx-auto">
-		<h1 class="text-4xl font-extrabold text-stone-700 pt-12 mb-8">National Parks Near You:</h1>
+	<div class="flex flex-col items-center mx-auto text-center">
+		<h1 class="text-4xl md:text-5xl font-extrabold text-stone-700 pt-12 mb-8">National Parks Near You</h1>
 		<div id="geocoder" class="geocoder mb-8"></div>
 	</div>
 
