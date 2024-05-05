@@ -1,13 +1,17 @@
 package api
 
 import (
-	"context"
+	"bytes"
 	"encoding/json"
+	"image"
+	"image/jpeg"
 	"log"
 	"net/http"
 	"os"
+	"path"
 
 	"github.com/labstack/echo/v5"
+	"github.com/nfnt/resize"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/forms"
 	"github.com/pocketbase/pocketbase/models"
@@ -20,11 +24,11 @@ type Park struct {
 	Latitude          string   `json:"latitude"`
 	Longitude         string   `json:"longitude"`
 	States            string   `json:"states"`
-	ImageURL          string   `json:"-"` // just save NPS url for an image as fallback
 	Images            []string `json:"-"` // "-" tells the json package to ignore this field when marshaling
 	Designation       string   `json:"designation"`
 	ParkCode          string   `json:"parkCode"`
-	DrivingDistance   float64
+	DriveTime         string
+	DrivingDistance   string
 	HaversineDistance float64
 	ParkRecordId      string
 }
@@ -39,7 +43,7 @@ func FetchAndStoreNationalParks(app *pocketbase.PocketBase) echo.HandlerFunc {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 		defer resp.Body.Close()
-
+		// decode the JSON response
 		var data struct {
 			Data []struct {
 				Park
@@ -63,12 +67,10 @@ func FetchAndStoreNationalParks(app *pocketbase.PocketBase) echo.HandlerFunc {
 				existingRecord, err := app.Dao().FindFirstRecordByData("nationalParks", "parkCode", park.ParkCode)
 				if err == nil {
 					record = existingRecord
-					record.Set("images", nil)
 				} else {
 					record = models.NewRecord(collection)
 					record.Set("parkCode", park.ParkCode)
 				}
-
 				// load regular data into the form
 				form := forms.NewRecordUpsert(app, record)
 				form.LoadData(map[string]any{
@@ -77,23 +79,25 @@ func FetchAndStoreNationalParks(app *pocketbase.PocketBase) echo.HandlerFunc {
 					"latitude":    park.Latitude,
 					"longitude":   park.Longitude,
 					"states":      park.States,
-					"imageURL":    park.Images[0].URL,
 				})
-
+				form.RemoveFiles("images")
 				for _, image := range park.Images {
 					imageURL := image.URL
-					// create a temp file to save the JPG image
-					tmpFile, err := filesystem.NewFileFromUrl(context.TODO(), imageURL)
+					// resize the image using my helper function
+					resizedImageBytes, err := downloadAndResizeImage(imageURL, 1200)
 					if err != nil {
-						log.Printf("Error creating temp file for image: %v", err)
+						log.Printf("Error resizing image: %v", err)
 						continue
 					}
-					if tmpFile.Size < 5242880 {
-						// add the file to the form if not > 5mb
-						form.AddFiles("images", tmpFile)
-					} else {
-						log.Printf("Image file is too large: %v, skipping...", tmpFile.Size)
+					// save the image to a temporary file
+					tmpFile, err := filesystem.NewFileFromBytes(resizedImageBytes, path.Base(imageURL))
+					if err != nil {
+						log.Printf("Error saving image to a temporary file: %v", err)
+						continue
 					}
+					log.Printf("Image size: %f kb", float64(tmpFile.Size)/1024.0)
+					// add the image to the form
+					form.AddFiles("images", tmpFile)
 				}
 				// validate and save the record with the image(s)
 				if err := form.Submit(); err != nil {
@@ -105,4 +109,30 @@ func FetchAndStoreNationalParks(app *pocketbase.PocketBase) echo.HandlerFunc {
 		}
 		return c.String(http.StatusOK, "National Parks data has been stored successfully.")
 	}
+}
+
+// downloadAndResizeImage downloads an image from the given URL and resizes it if it's larger than a maximum width.
+func downloadAndResizeImage(url string, maxWidth uint) ([]byte, error) {
+	// get the image from the NPS API URL
+	response, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+	// decode the downloaded image
+	img, _, err := image.Decode(response.Body)
+	if err != nil {
+		return nil, err
+	}
+	// resize the image if it's wider than the maxWidth
+	if img.Bounds().Dx() > int(maxWidth) {
+		img = resize.Resize(maxWidth, 0, img, resize.Lanczos3)
+	}
+	// encode the image back to a byte slice as JPEG
+	buf := new(bytes.Buffer)
+	err = jpeg.Encode(buf, img, nil)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }

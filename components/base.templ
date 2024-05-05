@@ -8,16 +8,20 @@ templ Head(title string) {
 	<head>
 		<link rel="stylesheet" href="/tailwind.css" />
 		<script src="https://unpkg.com/htmx.org@2.0.0-beta1/dist/htmx.min.js"></script>
-		<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet"/>
 		<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
 		<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+		<!-- this is the production build -->
+		<script src="https://unpkg.com/blaze-slider@latest/dist/blaze-slider.min.js"></script>
+		<!-- <script src="https://unpkg.com/blaze-slider@latest/dist/blaze-slider.dev.js"></script> -->
+
+		<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" />
 		<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css" />
 	</head>
 	<title>{ title }</title>
 }
 
 templ Body(component templ.Component) {
-	<body class="max-w-6xl mx-auto w-full min-h-lvh relative">
+	<body class="htmx-body max-w-6xl mx-auto w-full min-h-lvh relative" hx-boost="true">
 		@component
 	</body>
 }

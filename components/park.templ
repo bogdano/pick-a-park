@@ -1,0 +1,76 @@
+package components
+
+import (
+    "go-htmx/api"
+	"fmt"
+)
+
+templ Park(park api.Park, placeName string, date string) {
+	@DocType()
+	@Head("National Parks Finder")
+	@Body(ParkInfo(park, placeName, date))
+
+}
+
+templ ParkInfo(park api.Park, placeName string, date string) {
+    
+	<div class="flex flex-row flex-wrap gap-3 mx-3 justify-center pt-12 mb-8">
+        <a href="javascript:history.back()" class="my-auto">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
+                <title>Back</title>
+                <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                <g id="SVGRepo_iconCarrier"> <path d="M4 10L3.29289 10.7071L2.58579 10L3.29289 9.29289L4 10ZM21 18C21 18.5523 20.5523 19 20 19C19.4477 19 19 18.5523 19 18L21 18ZM8.29289 15.7071L3.29289 10.7071L4.70711 9.29289L9.70711 14.2929L8.29289 15.7071ZM3.29289 9.29289L8.29289 4.29289L9.70711 5.70711L4.70711 10.7071L3.29289 9.29289ZM4 9L14 9L14 11L4 11L4 9ZM21 16L21 18L19 18L19 16L21 16ZM14 9C17.866 9 21 12.134 21 16L19 16C19 13.2386 16.7614 11 14 11L14 9Z" /> </g>
+            </svg>
+        </a>
+		<div class="flex flex-row justify-center flex-wrap gap-3">
+        	<h1 class="text-4xl text-center my-auto text-stone-700 font-extrabold">{park.FullName}</h1>
+			<span class="text-xl text-center self-end mb-1.5 text-stone-400 font-bold">{park.States}</span>
+		</div>
+    </div>
+
+	<div class="blaze-slider">
+		<div class="blaze-container max-w-3xl mx-auto">
+			<div class="blaze-track-container md:rounded-2xl max-w-fit">
+				<div class="blaze-track">
+					for _, image := range park.Images {
+						<img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/eop7kcada8abcp4/%s/%s", park.ParkRecordId, image)))} 
+							alt="Park photo" 
+							class="park-photo w-auto object-cover block h-96"
+							loading="lazy" />
+					}
+				</div>
+			</div>
+			<!-- navigation buttons -->
+			<div class="flex justify-center items-center mt-2 gap-1">
+				<button class="blaze-prev" aria-label="Go to previous slide">
+					<svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15 7L10 12L15 17" stroke="#365314" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+				</button>
+				<div class="blaze-pagination"></div>
+				<button class="blaze-next" aria-label="Go to next slide">
+					<svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10 7L15 12L10 17" stroke="#365314" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<script>
+	if (typeof BlazeSlider === 'undefined') {
+		throw new Error('BlazeSlider is not loaded')
+	} else {
+		const config = {
+			all: {
+				loop: true,
+			},
+			'(max-width: 900px)': {
+			},
+			'(max-width: 500px)': {
+				loop: true,
+			},
+		}
+		const slider = document.querySelector('.blaze-slider')
+		new BlazeSlider(slider, config)
+	}
+	</script>
+}
+

@@ -1,38 +1,53 @@
 package components
 
-templ Index() {
+import (
+	"go-htmx/api"
+)
+
+templ Index(parks []api.Park, placeName string, state string) {
 	@DocType()
 	@Head("National Parks Finder")
-	@Body(pageIndex())
+	@Body(pageIndex(parks, placeName, state))
 }
 
-templ pageIndex() {
+templ pageIndex(parks []api.Park, placeName string, state string) {
 	<div class="flex flex-col items-center mx-auto">
-		<h1 class="text-4xl font-bold pt-12 mb-8">National Parks Near You:</h1>
+		<h1 class="text-4xl font-extrabold text-stone-700 pt-12 mb-8">National Parks Near You:</h1>
 		<div id="geocoder" class="geocoder mb-8"></div>
 	</div>
+
 	<div id="parks-container" class="text-center">
-		<span class="font-bold text-stone-400">Please select your starting point!</span>	
+		@Parks(parks, placeName, state)
 	</div>
 
 	<script>
-		// Initialize Mapbox Geocoder
+	// Initialize Mapbox Geocoder
+	initMapbox();
+	function initMapbox() {
 		mapboxgl.accessToken = "pk.eyJ1IjoiYm9nenoiLCJhIjoiY2x2MDU0NjBoMWwzYjJqbWpnazlpaGkzbiJ9.DbPQ3cgc-RxyA5vlEW0mdQ"
-		var geocoder = new MapboxGeocoder({
+		let geocoderElement = document.getElementById('geocoder');
+		geocoderElement.innerHTML = '';
+		let geocoder = new MapboxGeocoder({
 			accessToken: mapboxgl.accessToken,
 			mapboxgl: mapboxgl,
-			country: 'us',
 			types: 'place',
+			countries: 'us',
 		});
-		document.getElementById('geocoder').appendChild(geocoder.onAdd());
+		
+		geocoderElement.appendChild(geocoder.onAdd());
 		geocoder.on('result', function(e) {
-			var coords = e.result.geometry.coordinates;
-			var placeName = e.result.place_name;
+			let coords = e.result.geometry.coordinates;
+			let placeNameParts = e.result.place_name.split(',');
+			let placeName = placeNameParts[0];
+			let state = placeNameParts[1].trim();
+			let url = '/place/' + encodeURIComponent(placeName) + '/' + encodeURIComponent(state);
 			// Use HTMX to send coordinates to the server and get parks
-			htmx.ajax('POST', '/fetch-parks', {
-				values: {longitude: coords[0], latitude: coords[1], placeName: placeName},
-				target: '#parks-container',
+			htmx.ajax('GET', url, {
+				values: {longitude: coords[0], latitude: coords[1]},
+				target: '.htmx-body',
 			});
 		});
+	}
 	</script>
 }
+

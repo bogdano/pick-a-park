@@ -17,14 +17,14 @@ func FetchDrivingDistances(startCoordinates [2]float64, parksData []Park) ([]Par
 		latitude, _ := strconv.ParseFloat(parksData[i].Latitude, 64)
 		longitude, _ := strconv.ParseFloat(parksData[i].Longitude, 64)
 		parkCoords := [2]float64{latitude, longitude}
-		parksData[i].HaversineDistance = haversineDistance(startCoordinates, parkCoords, true)
+		parksData[i].HaversineDistance = haversineDistance(startCoordinates, parkCoords)
 	}
 	sort.Slice(parksData, func(i, j int) bool {
 		return parksData[i].HaversineDistance < parksData[j].HaversineDistance
 	})
 	// Select the top 6 closest parks
-	if len(parksData) > 6 {
-		parksData = parksData[:6]
+	if len(parksData) > 16 {
+		parksData = parksData[:16]
 	}
 
 	// Mapbox Matrix API call for driving distances
@@ -35,7 +35,7 @@ func FetchDrivingDistances(startCoordinates [2]float64, parksData []Park) ([]Par
 		coordinates += ";" + park.Longitude + "," + park.Latitude // Destination points
 	}
 	// Construct the full URL with all parameters
-	url := fmt.Sprintf("https://api.mapbox.com/directions-matrix/v1/mapbox/driving/%s?sources=0&annotations=distance&access_token=%s", coordinates, mapboxAccessToken)
+	url := fmt.Sprintf("https://api.mapbox.com/directions-matrix/v1/mapbox/driving/%s?sources=0&annotations=duration,distance&access_token=%s", coordinates, mapboxAccessToken)
 
 	// Make a GET request
 	req, err := http.NewRequest("GET", url, nil)
@@ -53,6 +53,7 @@ func FetchDrivingDistances(startCoordinates [2]float64, parksData []Park) ([]Par
 	}
 
 	var response struct {
+		Durations [][]float64 `json:"durations"`
 		Distances [][]float64 `json:"distances"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
@@ -61,13 +62,19 @@ func FetchDrivingDistances(startCoordinates [2]float64, parksData []Park) ([]Par
 
 	// Attach driving distances to parks
 	for i := range parksData {
-		parksData[i].DrivingDistance = response.Distances[0][i+1] // +1 to skip the start location
+		if response.Durations[0][i+1] == 0 {
+			parksData[i].DriveTime = ""
+			parksData[i].DrivingDistance = "ocean"
+		} else {
+			parksData[i].DriveTime = convertSeconds(response.Durations[0][i+1]) + " hr"
+			parksData[i].DrivingDistance = convertMetres(response.Distances[0][i+1], false) + " mi" // +1 to skip the start location
+		}
 	}
-	return parksData, nil
+	return parksData[:12], nil
 }
 
 // Haversine formula for calculating distances between two coordinates
-func haversineDistance(coords1, coords2 [2]float64, isMiles bool) float64 {
+func haversineDistance(coords1, coords2 [2]float64) float64 {
 	const R = 6371.0 // Radius of the Earth in kilometers
 	dLat := toRad(coords2[0] - coords1[0])
 	dLon := toRad(coords2[1] - coords1[1])
@@ -75,12 +82,21 @@ func haversineDistance(coords1, coords2 [2]float64, isMiles bool) float64 {
 		math.Cos(toRad(coords1[0]))*math.Cos(toRad(coords2[0]))*math.Sin(dLon/2)*math.Sin(dLon/2)
 	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
 	distance := R * c
-	if isMiles {
-		return distance * 0.621371
-	}
 	return distance
 }
 
 func toRad(deg float64) float64 {
 	return deg * (math.Pi / 180)
+}
+
+func convertMetres(metres float64, toMiles bool) string {
+	if toMiles {
+		return fmt.Sprintf("%.1f", metres/1609.34)
+	} else {
+		return fmt.Sprintf("%.1f", metres/1000)
+	}
+}
+
+func convertSeconds(seconds float64) string {
+	return fmt.Sprintf("%.1f", seconds/3600)
 }
