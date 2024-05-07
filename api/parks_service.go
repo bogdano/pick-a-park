@@ -144,13 +144,16 @@ func downloadAndResizeImage(url string, maxWidth uint) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	var resizedImage image.Image
 	// resize the image if it's wider than the maxWidth
 	if img.Bounds().Dx() > int(maxWidth) {
-		img = resize.Resize(maxWidth, 0, img, resize.Lanczos3)
+		resizedImage = resize.Resize(maxWidth, 0, img, resize.Lanczos3)
+	} else {
+		resizedImage = img
 	}
 	// encode the image back to a byte slice as JPEG
 	buf := new(bytes.Buffer)
-	err = jpeg.Encode(buf, img, nil)
+	err = jpeg.Encode(buf, resizedImage, nil)
 	if err != nil {
 		return nil, err
 	}

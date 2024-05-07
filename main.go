@@ -41,7 +41,11 @@ func main() {
 	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
 		template.NewTemplateRenderer(e.Router)
 
-		e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS("/pb/pb_public"), false))
+		if isGoRun {
+			e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS("/pb/pb_public"), false))
+		} else {
+			e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS("./pb_public"), false))
+		}
 
 		e.Router.GET("/", func(c echo.Context) error {
 			parks := []api.Park{}
