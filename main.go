@@ -4,34 +4,44 @@ import (
 	"encoding/json"
 	"go-htmx/api"
 	"go-htmx/components"
+	_ "go-htmx/migrations"
 	"go-htmx/template"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v5"
-
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/models"
+	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 	"github.com/pocketbase/pocketbase/tools/cron"
 )
 
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("Error loading .env file")
 	}
+
 	app := pocketbase.New()
+	isGoRun := strings.HasPrefix(os.Args[0], os.TempDir())
+	migratecmd.MustRegister(app, app.RootCmd, migratecmd.Config{
+		// enable auto creation of migration files when making collection changes in the
+		// admin UI (isGoRun check is to enable it only during development)
+		Automigrate: isGoRun,
+	})
+
 	// serves static files from the provided public dir (if exists)
 	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
 		template.NewTemplateRenderer(e.Router)
 
-		e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS("./pb_public"), false))
+		e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS("/pb/pb_public"), false))
 
 		e.Router.GET("/", func(c echo.Context) error {
 			parks := []api.Park{}
@@ -54,14 +64,7 @@ func main() {
 				}
 			}
 			var parkPlaceRecord *models.Record // Define outside to check later
-			// Proceed only if placeRecord is found
-			if placeRecord != nil {
-				var err error
-				parkPlaceRecord, err = app.Dao().FindFirstRecordByData("placeParks", "place", placeRecord.Id)
-				if err != nil {
-					return c.JSON(http.StatusBadRequest, map[string]string{"error": "Park not found"})
-				}
-			}
+
 			// regardless of queryParams, proceed to fetch park data
 			parkRecord, err := app.Dao().FindFirstRecordByData("nationalParks", "parkCode", parkCode)
 			if err != nil {

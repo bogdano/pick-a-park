@@ -12,7 +12,7 @@ templ Index(parks []api.Park, placeName string, state string) {
 
 templ pageIndex(parks []api.Park, placeName string, state string) {
 	<div class="flex flex-col items-center mx-auto text-center">
-		<h1 class="text-4xl md:text-5xl font-extrabold text-stone-700 pt-12 mb-8">National Parks Near You</h1>
+		<h1 class="text-4xl md:text-5xl font-extrabold text-stone-700 pt-12 mb-8"><a href="/" hx-boost="false">Pick A Park</a></h1>
 		<div id="geocoder" class="geocoder mb-8"></div>
 	</div>
 
@@ -32,6 +32,7 @@ templ pageIndex(parks []api.Park, placeName string, state string) {
 			mapboxgl: mapboxgl,
 			types: 'place',
 			countries: 'us',
+			placeholder: 'Where are you?',
 		});
 		
 		geocoderElement.appendChild(geocoder.onAdd());
@@ -48,6 +49,39 @@ templ pageIndex(parks []api.Park, placeName string, state string) {
 			});
 		});
 	}
+
+	window.onload = function() {
+    // Check if Geolocation is supported
+    if (!navigator.geolocation) {
+        console.log("Geolocation is not supported by this browser.");
+        return;
+		// else if path != /
+    } else if (window.location.pathname != '/') {
+		return;
+	}
+
+    // Get current position
+    navigator.geolocation.getCurrentPosition(function(position) {
+        let latitude = position.coords.latitude;
+        let longitude = position.coords.longitude;
+
+        // Use Mapbox Geocoding API to get place name
+        fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?types=place&countries=us&access_token=pk.eyJ1IjoiYm9nenoiLCJhIjoiY2x2MDU0NjBoMWwzYjJqbWpnazlpaGkzbiJ9.DbPQ3cgc-RxyA5vlEW0mdQ`)
+            .then(response => response.json())
+            .then(data => {
+                let placeNameParts = data.features[0].place_name.split(',');
+                let placeName = placeNameParts[0];
+                let state = placeNameParts[1].trim();
+                let url = '/place/' + encodeURIComponent(placeName) + '/' + encodeURIComponent(state);
+
+                // Use HTMX to send coordinates to the server and get parks
+                htmx.ajax('GET', url, {
+                    values: {longitude: longitude, latitude: latitude},
+                    target: '.htmx-body',
+                });
+            });
+    });
+}
 	</script>
 }
 

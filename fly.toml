@@ -1,0 +1,29 @@
+# fly.toml app configuration file generated for nps-go on 2024-05-06T16:36:54-06:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'nps-go'
+primary_region = 'sea'
+
+[build]
+
+[env]
+  PORT = '8080'
+
+[[mounts]]
+  source = 'pb_data'
+  destination = '/pb/pb_data'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ['app']
+
+[[vm]]
+  memory = '512mb'
+  cpu_kind = 'shared'
+  cpus = 1

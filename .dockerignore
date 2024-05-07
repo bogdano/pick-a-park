@@ -1,0 +1,8 @@
+tmp/
+pb_data/
+fly.toml
+README.md
+tailwind.config.js
+.air.toml
+.gitignore
+.env

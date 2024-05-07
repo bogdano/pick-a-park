@@ -48,6 +48,7 @@ type WeatherDate struct {
 	TemperatureNightF string `json:"temperatureNightF"`
 	TemperatureNightC string `json:"temperatureNightC"`
 	WeatherIcon       string `json:"weatherIcon"`
+	LastUpdated       string `json:"lastUpdated"`
 }
 
 func FetchAndStoreNationalParks(app *pocketbase.PocketBase) echo.HandlerFunc {
@@ -257,6 +258,7 @@ func parseWeatherData(apiUrl string) ([]WeatherDate, error) {
 			TemperatureNightF: nightF,
 			TemperatureNightC: nightC,
 			WeatherIcon:       iconURL,
+			LastUpdated:       time.Now().Format("15:04"),
 		})
 	}
 	return weatherDates, nil
