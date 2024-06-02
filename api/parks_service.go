@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo/v5"
@@ -19,6 +20,7 @@ import (
 	"github.com/pocketbase/pocketbase/forms"
 	"github.com/pocketbase/pocketbase/models"
 	"github.com/pocketbase/pocketbase/tools/filesystem"
+	"github.com/pocketbase/pocketbase/tools/inflector"
 	"golang.org/x/image/draw"
 )
 
@@ -114,9 +116,18 @@ func FetchAndStoreNationalParks(app *pocketbase.PocketBase) error {
 				"weatherInfo":    park.WeatherInfo,
 				"directionsInfo": park.DirectionsInfo,
 			})
-			form.RemoveFiles("images")
+			current_images := record.GetStringSlice("images")
+			// labeled loopty loop
+		ImageLoop:
 			for _, image := range park.Images {
 				imageURL := image.URL
+				// check if the image is already in the form
+				for _, existingImage := range current_images {
+					if inflector.Snakecase(quick_strip_url(imageURL)) == quick_strip(existingImage) {
+						log.Print("skipped")
+						continue ImageLoop
+					}
+				}
 				// resize the image using my helper function
 				resizedImageBytes, err := downloadAndResizeImage(imageURL, 1500)
 				if err != nil {
@@ -143,6 +154,23 @@ func FetchAndStoreNationalParks(app *pocketbase.PocketBase) error {
 		}
 	}
 	return nil
+}
+
+// remove file extension and everything to the left of the last /
+func quick_strip_url(s string) string {
+	filename := path.Base(s)                 // Get the filename
+	ext := path.Ext(filename)                // Get the extension
+	return strings.TrimSuffix(filename, ext) // Remove the extension from the filename
+}
+
+// remove everything from the right up to the first underscore from the right, from a given string
+func quick_strip(s string) string {
+	for i := len(s) - 1; i >= 0; i-- {
+		if s[i] == '_' {
+			return s[:i]
+		}
+	}
+	return s
 }
 
 func fetchCampgrounds(app *pocketbase.PocketBase, parkId string, parkCode string) error {

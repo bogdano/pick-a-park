@@ -26,17 +26,16 @@ templ pageIndex(parks []api.Park, placeName string, state string) {
 		@Parks(parks, placeName, state)
 	</div>
 
-	<button id="load-more-parks"
-		hx-get={ fmt.Sprintf("/load-more-parks/%s/%s", placeName, state) }
-		hx-target="#parks" 
-		hx-swap="beforeend" 
-		hx-push-url="false"
-		hx-boost="false"
-		class="block w-96 mx-auto mb-8 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
-		Load More Parks
-	</button>
-
 	if len(parks) != 0 {
+		<button id="load-more-parks"
+			hx-get={ fmt.Sprintf("/load-more-parks/%s/%s", placeName, state) }
+			hx-target="#parks" 
+			hx-swap="beforeend" 
+			hx-push-url="false"
+			hx-boost="false"
+			class="block w-72 mx-auto mb-8 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
+			Load More Parks
+		</button>
 		<p class="text-xs mb-4 text-center"><sup class="text-base text-lime-800">*</sup> Parks are sorted by as-the-crow-flies distance from your location, and thus may not be sorted by driving distance.</p>
 	}
 

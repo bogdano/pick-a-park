@@ -10,7 +10,7 @@ templ Parks(parks []api.Park, placeName string, stateName string) {
     } else {
         <span class="font-bold text-xl text-stone-700">Parks near <span class="text-lime-700">{ placeName }, { stateName } <sup>*</sup></span></span>
     }
-    <div id="parks" class="w-full flex gap-2 md:gap-4 flex-wrap justify-center mt-8 mb-24">
+    <div id="parks" class="w-full flex gap-2 md:gap-4 flex-wrap justify-center mt-8 mb-12">
         for _, park := range parks {
             @ParkCard(park, placeName, stateName)
         }
