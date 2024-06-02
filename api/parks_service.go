@@ -15,30 +15,45 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v5"
-	"github.com/nfnt/resize"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/forms"
 	"github.com/pocketbase/pocketbase/models"
 	"github.com/pocketbase/pocketbase/tools/filesystem"
+	"golang.org/x/image/draw"
 )
 
 type Park struct {
-	FullName       string   `json:"fullName"`
-	Description    string   `json:"description"`
-	Latitude       string   `json:"latitude"`
-	Longitude      string   `json:"longitude"`
-	States         string   `json:"states"`
-	Images         []string `json:"-"` // "-" tells the json package to ignore this field when marshaling
-	Designation    string   `json:"designation"`
-	ParkCode       string   `json:"parkCode"`
-	DirectionsInfo string   `json:"directionsInfo"`
-	WeatherInfo    string   `json:"weatherInfo"`
-
+	FullName          string   `json:"fullName"`
+	Description       string   `json:"description"`
+	Latitude          string   `json:"latitude"`
+	Longitude         string   `json:"longitude"`
+	States            string   `json:"states"`
+	Images            []string `json:"-"` // "-" tells the json package to ignore this field when marshalling
+	Designation       string   `json:"designation"`
+	ParkCode          string   `json:"parkCode"`
+	DirectionsInfo    string   `json:"directionsInfo"`
+	WeatherInfo       string   `json:"weatherInfo"`
 	DriveTime         string
 	DrivingDistance   string
 	HaversineDistance float64
 	ParkRecordId      string
 	Weather           []WeatherDate
+	Campgrounds       []Campground
+}
+
+type Campground struct {
+	Name                string   `json:"name"`
+	ParkCode            string   `json:"parkCode"`
+	Description         string   `json:"description"`
+	Latitude            string   `json:"latitude"`
+	Longitude           string   `json:"longitude"`
+	ReservationInfo     string   `json:"reservationInfo"`
+	ReservationURL      string   `json:"reservationUrl"`
+	DirectionsOverview  string   `json:"directionsOverview"`
+	Images              []string `json:"-"`
+	WeatherOverview     string   `json:"weatherOverview"`
+	Reservable          string   `json:"numberOfSitesReservable"`
+	FirstComeFirstServe string   `json:"numberOfSitesFirstComeFirstServe"`
 }
 
 type WeatherDate struct {
@@ -51,88 +66,174 @@ type WeatherDate struct {
 	LastUpdated       string `json:"lastUpdated"`
 }
 
-func FetchAndStoreNationalParks(app *pocketbase.PocketBase) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		// fetch data from NPS API
-		NPS_API_KEY := os.Getenv("NPS_API_KEY")
-		var NPS_API_URL = "https://developer.nps.gov/api/v1/parks?limit=500&api_key=" + NPS_API_KEY
-		resp, err := http.Get(NPS_API_URL)
-		if err != nil {
-			return c.String(http.StatusInternalServerError, err.Error())
-		}
-		defer resp.Body.Close()
-		// decode the JSON response
-		var data struct {
-			Data []struct {
-				Park
-				Images []struct {
-					URL string `json:"url"`
-				} `json:"images"`
-			} `json:"data"`
-		}
-		if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-			log.Fatal(err)
-		}
-		// get the Pocketbase collection for National Parks
-		collection, err := app.Dao().FindCollectionByNameOrId("nationalParks")
-		if err != nil {
-			return c.String(http.StatusInternalServerError, err.Error())
-		}
-		// filter for national parks only and store in Pocketbase
-		for _, park := range data.Data {
-			if park.Designation == "National Park" || park.Designation == "National Park & Preserve" {
-				var record *models.Record
-				existingRecord, err := app.Dao().FindFirstRecordByData("nationalParks", "parkCode", park.ParkCode)
-				if err == nil {
-					record = existingRecord
-				} else {
-					record = models.NewRecord(collection)
-					record.Set("parkCode", park.ParkCode)
+func FetchAndStoreNationalParks(app *pocketbase.PocketBase) error {
+	// fetch data from NPS API
+	NPS_API_KEY := os.Getenv("NPS_API_KEY")
+	var NPS_API_URL = "https://developer.nps.gov/api/v1/parks?limit=500&api_key=" + NPS_API_KEY
+	resp, err := http.Get(NPS_API_URL)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	// decode the JSON response
+	var data struct {
+		Data []struct {
+			Park
+			Images []struct {
+				URL string `json:"url"`
+			} `json:"images"`
+		} `json:"data"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return err
+	}
+	// get the Pocketbase collection for National Parks
+	collection, err := app.Dao().FindCollectionByNameOrId("nationalParks")
+	if err != nil {
+		return err
+	}
+	// filter for national parks only and store in Pocketbase
+	for _, park := range data.Data {
+		if park.Designation == "National Park" || park.Designation == "National Park & Preserve" {
+			var record *models.Record
+			existingRecord, err := app.Dao().FindFirstRecordByData("nationalParks", "parkCode", park.ParkCode)
+			if err == nil {
+				record = existingRecord
+			} else {
+				record = models.NewRecord(collection)
+				record.Set("parkCode", park.ParkCode)
+			}
+			// load regular data into the form
+			form := forms.NewRecordUpsert(app, record)
+			form.LoadData(map[string]any{
+				"name":           park.FullName,
+				"description":    park.Description,
+				"latitude":       park.Latitude,
+				"longitude":      park.Longitude,
+				"states":         park.States,
+				"weatherInfo":    park.WeatherInfo,
+				"directionsInfo": park.DirectionsInfo,
+			})
+			form.RemoveFiles("images")
+			for _, image := range park.Images {
+				imageURL := image.URL
+				// resize the image using my helper function
+				resizedImageBytes, err := downloadAndResizeImage(imageURL, 1500)
+				if err != nil {
+					log.Printf("Error resizing image: %v", err)
+					continue
 				}
-				// load regular data into the form
-				form := forms.NewRecordUpsert(app, record)
-				form.LoadData(map[string]any{
-					"name":           park.FullName,
-					"description":    park.Description,
-					"latitude":       park.Latitude,
-					"longitude":      park.Longitude,
-					"states":         park.States,
-					"weatherInfo":    park.WeatherInfo,
-					"directionsInfo": park.DirectionsInfo,
-				})
-				form.RemoveFiles("images")
-				for _, image := range park.Images {
-					imageURL := image.URL
-					// resize the image using my helper function
-					resizedImageBytes, err := downloadAndResizeImage(imageURL, 1200)
-					if err != nil {
-						log.Printf("Error resizing image: %v", err)
-						continue
-					}
-					// save the image to a temporary file
-					tmpFile, err := filesystem.NewFileFromBytes(resizedImageBytes, path.Base(imageURL))
-					if err != nil {
-						log.Printf("Error saving image to a temporary file: %v", err)
-						continue
-					}
-					log.Printf("Image size: %f kb", float64(tmpFile.Size)/1024.0)
-					// add the image to the form
-					form.AddFiles("images", tmpFile)
+				// save the image to a temporary file
+				tmpFile, err := filesystem.NewFileFromBytes(resizedImageBytes, path.Base(imageURL))
+				if err != nil {
+					log.Printf("Error saving image to a temporary file: %v", err)
+					continue
 				}
-				// validate and save the record with the image(s)
+				resizedImageBytes = nil // free up memory
+				log.Printf("Image size: %f kb", float64(tmpFile.Size)/1024.0)
+				// add the image to the form
+				form.AddFiles("images", tmpFile)
+				tmpFile = nil // free up memory
 				if err := form.Submit(); err != nil {
 					log.Printf("Error saving record with image: %v", err)
 					continue
 				}
-				log.Printf("Record saved: %v", record.Id)
+			}
+			fetchCampgrounds(app, record.Id, park.ParkCode)
+		}
+	}
+	return nil
+}
+
+func fetchCampgrounds(app *pocketbase.PocketBase, parkId string, parkCode string) error {
+	// fetch data from NPS API
+	NPS_API_KEY := os.Getenv("NPS_API_KEY")
+	var NPS_API_URL = "https://developer.nps.gov/api/v1/campgrounds?parkCode=" + parkCode + "&api_key=" + NPS_API_KEY
+	resp, err := http.Get(NPS_API_URL)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return err
+	}
+	// decode the JSON response and get image urls from the JSON
+	var data struct {
+		Data []struct {
+			Campground
+			Images []struct {
+				URL string `json:"url"`
+			} `json:"images"`
+		} `json:"data"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return err
+	}
+	campgrounds, err := app.Dao().FindCollectionByNameOrId("campgrounds")
+	if err != nil {
+		return err
+	}
+	// save the campgrounds to the national park record
+	for _, campground := range data.Data {
+		var record *models.Record
+		// Check if the campground already exists
+		existingCampground, err := app.Dao().FindFirstRecordByData("campgrounds", "name", campground.Name)
+		if err == nil {
+			record = existingCampground
+		} else {
+			record = models.NewRecord(campgrounds)
+		}
+		form := forms.NewRecordUpsert(app, record)
+		form.LoadData(map[string]any{
+			"name":                campground.Name,
+			"parkId":              parkId,
+			"description":         campground.Description,
+			"latitude":            campground.Latitude,
+			"longitude":           campground.Longitude,
+			"reservationInfo":     campground.ReservationInfo,
+			"reservationUrl":      campground.ReservationURL,
+			"directionsOverview":  campground.DirectionsOverview,
+			"weatherOverview":     campground.WeatherOverview,
+			"reservable":          campground.Reservable,
+			"firstComeFirstServe": campground.FirstComeFirstServe,
+		})
+		form.RemoveFiles("images")
+		// fetch images for each campground
+		for _, image := range campground.Images {
+			imageURL := image.URL
+			// resize the image using my helper function
+			resizedImageBytes, err := downloadAndResizeImage(imageURL, 1500)
+			if err != nil {
+				log.Printf("Error resizing image: %v", err)
+				continue
+			}
+			// save the image to a temporary file
+			tmpFile, err := filesystem.NewFileFromBytes(resizedImageBytes, path.Base(imageURL))
+			if err != nil {
+				log.Printf("Error saving image to a temporary file: %v", err)
+				continue
+			}
+			resizedImageBytes = nil // free up memory
+			log.Printf("Resizing campground image: %f kb", float64(tmpFile.Size)/1024.0)
+			// add the image to the form
+			form.AddFiles("images", tmpFile)
+			tmpFile = nil // free up memory
+			if err := form.Submit(); err != nil {
+				log.Printf("Error saving record with image: %v", err)
+				continue
 			}
 		}
-		return c.String(http.StatusOK, "National Parks data has been stored successfully.")
+		// save the campground record to the national park record
+		if err := form.Submit(); err != nil {
+			log.Printf("Error saving record with image: %v", err)
+			continue
+		}
 	}
+	return nil
 }
 
 // downloadAndResizeImage downloads an image from the given URL and resizes it if it's larger than a maximum width.
-func downloadAndResizeImage(url string, maxWidth uint) ([]byte, error) {
+func downloadAndResizeImage(url string, maxWidth int) ([]byte, error) {
 	// get the image from the NPS API URL
 	response, err := http.Get(url)
 	if err != nil {
@@ -144,59 +245,60 @@ func downloadAndResizeImage(url string, maxWidth uint) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	var resizedImage image.Image
 	// resize the image if it's wider than the maxWidth
-	if img.Bounds().Dx() > int(maxWidth) {
-		resizedImage = resize.Resize(maxWidth, 0, img, resize.Lanczos3)
+	var dst *image.RGBA
+	if img.Bounds().Dx() > maxWidth {
+		dst = image.NewRGBA(image.Rect(0, 0, maxWidth, img.Bounds().Dy()*maxWidth/img.Bounds().Dx()))
+		draw.NearestNeighbor.Scale(dst, dst.Rect, img, img.Bounds(), draw.Over, nil)
 	} else {
-		resizedImage = img
+		dst = image.NewRGBA(image.Rect(0, 0, img.Bounds().Dx(), img.Bounds().Dy()))
+		draw.Draw(dst, dst.Bounds(), img, img.Bounds().Min, draw.Over)
 	}
 	// encode the image back to a byte slice as JPEG
 	buf := new(bytes.Buffer)
-	err = jpeg.Encode(buf, resizedImage, nil)
+	err = jpeg.Encode(buf, dst, nil)
 	if err != nil {
 		return nil, err
 	}
+	dst, img = nil, nil // free up memory
 	return buf.Bytes(), nil
 }
 
 // FetchAndStoreWeather fetches weather data for each national park and stores it in the record.
-func FetchAndStoreWeather(app *pocketbase.PocketBase) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		// get all national parks
-		parks, err := app.Dao().FindRecordsByExpr("nationalParks", nil)
-		if err != nil {
-			return c.String(http.StatusInternalServerError, "Failed to fetch parks: "+err.Error())
-		}
-		// fetch weather data for each park
-		for _, park := range parks {
-			lon := park.GetString("longitude")
-			lat := park.GetString("latitude")
-			apiUrl, err := buildWeatherAPIUrl(lon, lat)
-			if err != nil {
-				log.Printf("Failed to build weather API URL for park %s: %s", park.GetString("parkCode"), err)
-				continue
-			}
-			weatherData, err := parseWeatherData(apiUrl) // Parse directly from API
-			if err != nil {
-				log.Printf("Failed to fetch weather for park %s: %s", park.GetString("parkCode"), err)
-				continue // Continue with other parks even if one fails
-			}
-			// save the weather data to the record
-			jsonData, err := json.Marshal(weatherData)
-			if err != nil {
-				log.Printf("Failed to encode weather data for park %s: %s", park.GetString("parkCode"), err)
-				continue
-			}
-			park.Set("weather", jsonData)
-			if err := app.Dao().Save(park); err != nil {
-				log.Printf("Failed to save weather data for park %s: %s", park.GetString("parkCode"), err)
-				continue
-			}
-			log.Printf("Weather data saved for park %s", park.GetString("parkCode"))
-		}
-		return c.String(http.StatusOK, "Weather data has been stored successfully.")
+func FetchAndStoreWeather(app *pocketbase.PocketBase) error {
+	// get all national parks
+	parks, err := app.Dao().FindRecordsByExpr("nationalParks", nil)
+	if err != nil {
+		return err
 	}
+	// fetch weather data for each park
+	for _, park := range parks {
+		lon := park.GetString("longitude")
+		lat := park.GetString("latitude")
+		apiUrl, err := buildWeatherAPIUrl(lon, lat)
+		if err != nil {
+			log.Printf("Failed to build weather API URL for park %s: %s", park.GetString("parkCode"), err)
+			continue
+		}
+		weatherData, err := parseWeatherData(apiUrl) // Parse directly from API
+		if err != nil {
+			log.Printf("Failed to fetch weather for park %s: %s", park.GetString("parkCode"), err)
+			continue // Continue with other parks even if one fails
+		}
+		// save the weather data to the record
+		jsonData, err := json.Marshal(weatherData)
+		if err != nil {
+			log.Printf("Failed to encode weather data for park %s: %s", park.GetString("parkCode"), err)
+			return err
+		}
+		park.Set("weather", jsonData)
+		if err := app.Dao().Save(park); err != nil {
+			log.Printf("Failed to save weather data for park %s: %s", park.GetString("parkCode"), err)
+			return err
+		}
+		log.Printf("Weather data saved for park %s", park.GetString("parkCode"))
+	}
+	return nil
 }
 
 // ping OpenWeatherMap API
@@ -261,7 +363,7 @@ func parseWeatherData(apiUrl string) ([]WeatherDate, error) {
 			TemperatureNightF: nightF,
 			TemperatureNightC: nightC,
 			WeatherIcon:       iconURL,
-			LastUpdated:       time.Now().Format("15:04"),
+			LastUpdated:       time.Now().Format(time.RFC3339),
 		})
 	}
 	return weatherDates, nil
@@ -275,4 +377,24 @@ func kelvinToFahrenheit(k float64) string {
 // Kelvin to Celsius
 func kelvinToCelsius(k float64) string {
 	return fmt.Sprintf("%.1f", k-273.15)
+}
+
+func FetchAndStoreWeatherHTTP(app *pocketbase.PocketBase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		err := FetchAndStoreWeather(app)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
+		return c.String(http.StatusOK, "Weather data has been stored successfully.")
+	}
+}
+
+func FetchAndStoreNationalParksHTTP(app *pocketbase.PocketBase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		err := FetchAndStoreNationalParks(app)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
+		return c.String(http.StatusOK, "National Parks data has been stored successfully.")
+	}
 }

@@ -1,0 +1,12 @@
+package components
+
+import (
+    "go-htmx/api"
+)
+ 
+templ MoreParks(parks []api.Park, placeName string, stateName string) {
+    for _, park := range parks {
+        @ParkCard(park, placeName, stateName)
+    }
+}
+

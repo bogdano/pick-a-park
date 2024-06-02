@@ -20,4 +20,6 @@ COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 
 # the following lines caused a lot of pain to figure out
 COPY ./pb_public /pb/pb_public
+# not sure about this
+COPY ./migrations /pb/migrations
 CMD ["run-app", "serve", "--http=0.0.0.0:8080"]

@@ -11,7 +11,7 @@ import (
 )
 
 // FetchDrivingDistances fetches driving distances using the Mapbox Matrix API and sorts by Haversine distance.
-func FetchDrivingDistances(startCoordinates [2]float64, parksData []Park) ([]Park, error) {
+func FetchDrivingDistances(startCoordinates [2]float64, parksData []Park, count int) ([]Park, error) {
 	// Calculate Haversine distance for each park and sort
 	for i := range parksData {
 		latitude, _ := strconv.ParseFloat(parksData[i].Latitude, 64)
@@ -22,9 +22,9 @@ func FetchDrivingDistances(startCoordinates [2]float64, parksData []Park) ([]Par
 	sort.Slice(parksData, func(i, j int) bool {
 		return parksData[i].HaversineDistance < parksData[j].HaversineDistance
 	})
-	// Select the top 6 closest parks
-	if len(parksData) > 16 {
-		parksData = parksData[:16]
+	// Select the top closest parks
+	if len(parksData) > count+4 {
+		parksData = parksData[:count+4]
 	}
 
 	// Mapbox Matrix API call for driving distances
@@ -70,7 +70,7 @@ func FetchDrivingDistances(startCoordinates [2]float64, parksData []Park) ([]Par
 			parksData[i].DrivingDistance = convertMetres(response.Distances[0][i+1], false) + " mi" // +1 to skip the start location
 		}
 	}
-	return parksData[:12], nil
+	return parksData[:count], nil
 }
 
 // Haversine formula for calculating distances between two coordinates

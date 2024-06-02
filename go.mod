@@ -6,9 +6,9 @@ require (
 	github.com/a-h/templ v0.2.663
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v5 v5.0.0-20230722203903-ec5b858dab61
-	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/pocketbase/dbx v1.10.1
 	github.com/pocketbase/pocketbase v0.20.2
+	golang.org/x/image v0.14.0
 )
 
 require (
@@ -64,7 +64,6 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	gocloud.dev v0.35.0 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
-	golang.org/x/image v0.14.0 // indirect
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/oauth2 v0.15.0 // indirect

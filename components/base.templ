@@ -21,12 +21,37 @@ templ Head(title string) {
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Sedan+SC&display=swap" rel="stylesheet" />
+
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+		<link rel="manifest" href="/site.webmanifest" />
+		<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#4d7c0f" />
+		<meta name="msapplication-TileColor" content="#ffc40d" />
+		<meta name="theme-color" content="#4d7c0f" />
+		
+		<script defer src="https://cloud.umami.is/script.js" data-website-id="66465c10-c517-4d2a-9475-e11db838b937"></script>
 	</head>
 	<title>{ title }</title>
 }
 
 templ Body(component templ.Component) {
-	<body class="htmx-body max-w-6xl mx-auto w-full min-h-lvh relative" hx-boost="true" hx-swap="innerHTML transition:true">
+	<body class="htmx-body max-w-6xl mx-auto w-full min-h-lvh relative" hx-boost="true" hx-swap="innerHTML transition:true" hx-indicator=".loading-bar">
+		<div class="loading-bar"></div>
 		@component
 	</body>
+	<script>
+		// register service worker for offline support in PWA
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', function() {
+				navigator.serviceWorker.register('/sw.js').then(function(registration) {
+					// registration was successful
+					console.log('ServiceWorker registration successful with scope: ', registration.scope);
+				}, function(err) {
+					// registration failed :(
+					console.log('ServiceWorker registration failed: ', err);
+				});
+			});
+		}
+	</script>
 }

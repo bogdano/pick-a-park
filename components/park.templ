@@ -4,13 +4,13 @@ import (
     "go-htmx/api"
 	"fmt"
 	"strings"
+	"time"
 )
 
 templ Park(park api.Park, placeName string) {
 	@DocType()
-	@Head("National Parks Finder")
+	@Head(park.FullName)
 	@Body(ParkInfo(park, placeName))
-
 }
 
 func trimParkName(fullName string) string {
@@ -23,40 +23,63 @@ func trimParkName(fullName string) string {
     return fullName
 }
 
+func lastUpdated(u string) string {
+	// get time since last update in minutes or hours
+	updated_time, err := time.Parse(time.RFC3339, u)
+	if err != nil {
+		return "unknown"
+	}
+	updated := time.Since(updated_time)
+	if updated.Minutes() < 60 {
+		return fmt.Sprintf("%d min", int(updated.Minutes()))
+	}
+	return fmt.Sprintf("%d hr", int(updated.Hours()))	
+}
+
 templ ParkInfo(park api.Park, placeName string) {
-    
-	<div class="flex flex-row flex-wrap gap-3 mx-3 justify-center pt-12 mb-8">
-        <button onclick="history.back()" class="my-auto" id="backBtn">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="hidden md:block fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
-                <title>Back</title>
-                <g id="SVGRepo_bgCarrier" stroke-width="0"/>
-                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-                <g id="SVGRepo_iconCarrier"> <path d="M4 10L3.29289 10.7071L2.58579 10L3.29289 9.29289L4 10ZM21 18C21 18.5523 20.5523 19 20 19C19.4477 19 19 18.5523 19 18L21 18ZM8.29289 15.7071L3.29289 10.7071L4.70711 9.29289L9.70711 14.2929L8.29289 15.7071ZM3.29289 9.29289L8.29289 4.29289L9.70711 5.70711L4.70711 10.7071L3.29289 9.29289ZM4 9L14 9L14 11L4 11L4 9ZM21 16L21 18L19 18L19 16L21 16ZM14 9C17.866 9 21 12.134 21 16L19 16C19 13.2386 16.7614 11 14 11L14 9Z" /> </g>
-            </svg>
-        </button>
-		<div class="flex flex-row justify-center flex-wrap gap-3">
-        	<h1 class="text-4xl md:text-5xl text-center my-auto text-stone-700 font-extrabold">{park.FullName}</h1>
-			<span class="text-xl text-center self-end mb-0.5 text-stone-400 font-bold">{park.States}</span>
-		</div>
-		<div class="flex flex-row justify-center gap-3">
-			<button onclick="history.back()" class="my-auto md:hidden" id="backBtn">
-				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
+	<div class="flex flex-col items-center justify-center pt-12 md:mb-8 gap-4">
+		<a href="/" hx-boost="false" class="block">
+			<img src="/logo.webp" alt="National Parks Finder logo" class="w-36 h-36" />
+		</a>
+		<div class="flex flex-row flex-wrap gap-3 mx-3 justify-center">
+			<div class="flex flex-row justify-center gap-3 mb-4">
+				<button onclick="history.back()" class="my-auto md:hidden" id="backBtn">
+					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
+						<title>Back</title>
+						<g id="SVGRepo_bgCarrier" stroke-width="0"/>
+						<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+						<g id="SVGRepo_iconCarrier"> <path d="M4 10L3.29289 10.7071L2.58579 10L3.29289 9.29289L4 10ZM21 18C21 18.5523 20.5523 19 20 19C19.4477 19 19 18.5523 19 18L21 18ZM8.29289 15.7071L3.29289 10.7071L4.70711 9.29289L9.70711 14.2929L8.29289 15.7071ZM3.29289 9.29289L8.29289 4.29289L9.70711 5.70711L4.70711 10.7071L3.29289 9.29289ZM4 9L14 9L14 11L4 11L4 9ZM21 16L21 18L19 18L19 16L21 16ZM14 9C17.866 9 21 12.134 21 16L19 16C19 13.2386 16.7614 11 14 11L14 9Z" /> </g>
+					</svg>
+				</button>
+				<button onclick="share();" class="my-auto md:hidden" id="backBtn">
+					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="fill-none shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
+						<title>Share</title>
+						<g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 12C9 13.3807 7.88071 14.5 6.5 14.5C5.11929 14.5 4 13.3807 4 12C4 10.6193 5.11929 9.5 6.5 9.5C7.88071 9.5 9 10.6193 9 12Z" stroke="#15803d" stroke-width="1.5"></path> <path d="M14 6.5L9 10" stroke="#15803d" stroke-width="1.5" stroke-linecap="round"></path> <path d="M14 17.5L9 14" stroke="#15803d" stroke-width="1.5" stroke-linecap="round"></path> <path d="M19 18.5C19 19.8807 17.8807 21 16.5 21C15.1193 21 14 19.8807 14 18.5C14 17.1193 15.1193 16 16.5 16C17.8807 16 19 17.1193 19 18.5Z" stroke="#15803d" stroke-width="1.5"></path> <path d="M19 5.5C19 6.88071 17.8807 8 16.5 8C15.1193 8 14 6.88071 14 5.5C14 4.11929 15.1193 3 16.5 3C17.8807 3 19 4.11929 19 5.5Z" stroke="#15803d" stroke-width="1.5"></path> </g>
+					</svg>
+				</button>
+			</div>
+			<button onclick="history.back()" class="my-auto" id="backBtn">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="hidden md:block fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
 					<title>Back</title>
 					<g id="SVGRepo_bgCarrier" stroke-width="0"/>
 					<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
 					<g id="SVGRepo_iconCarrier"> <path d="M4 10L3.29289 10.7071L2.58579 10L3.29289 9.29289L4 10ZM21 18C21 18.5523 20.5523 19 20 19C19.4477 19 19 18.5523 19 18L21 18ZM8.29289 15.7071L3.29289 10.7071L4.70711 9.29289L9.70711 14.2929L8.29289 15.7071ZM3.29289 9.29289L8.29289 4.29289L9.70711 5.70711L4.70711 10.7071L3.29289 9.29289ZM4 9L14 9L14 11L4 11L4 9ZM21 16L21 18L19 18L19 16L21 16ZM14 9C17.866 9 21 12.134 21 16L19 16C19 13.2386 16.7614 11 14 11L14 9Z" /> </g>
 				</svg>
-        	</button>
+			</button>
+			<div class="flex flex-row justify-center flex-wrap gap-3">
+				<h1 class="text-4xl md:text-5xl text-center my-auto text-stone-700 font-extrabold">{park.FullName}</h1>
+				<span class="text-xl text-center self-end mb-0.5 text-stone-400 font-bold">{park.States}</span>
+			</div>
 			<button onclick="share();" class="my-auto" id="backBtn">
-				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="fill-none shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="hidden md:block fill-none shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
 					<title>Share</title>
 					<g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 12C9 13.3807 7.88071 14.5 6.5 14.5C5.11929 14.5 4 13.3807 4 12C4 10.6193 5.11929 9.5 6.5 9.5C7.88071 9.5 9 10.6193 9 12Z" stroke="#15803d" stroke-width="1.5"></path> <path d="M14 6.5L9 10" stroke="#15803d" stroke-width="1.5" stroke-linecap="round"></path> <path d="M14 17.5L9 14" stroke="#15803d" stroke-width="1.5" stroke-linecap="round"></path> <path d="M19 18.5C19 19.8807 17.8807 21 16.5 21C15.1193 21 14 19.8807 14 18.5C14 17.1193 15.1193 16 16.5 16C17.8807 16 19 17.1193 19 18.5Z" stroke="#15803d" stroke-width="1.5"></path> <path d="M19 5.5C19 6.88071 17.8807 8 16.5 8C15.1193 8 14 6.88071 14 5.5C14 4.11929 15.1193 3 16.5 3C17.8807 3 19 4.11929 19 5.5Z" stroke="#15803d" stroke-width="1.5"></path> </g>
 				</svg>
 			</button>
 		</div>
-    </div>
+	</div>
 
-	<div id="description" class="sedan-sc-regular text-center text-stone-700 text-2xl max-w-5xl mx-4 md:mx-auto mb-8">
+	<div id="description" class="sedan-sc-regular text-center text-stone-700 text-xl max-w-5xl mx-4 md:mx-auto mb-8">
 		{park.Description}
 	</div>
 
@@ -78,7 +101,7 @@ templ ParkInfo(park api.Park, placeName string) {
 					<button class="blaze-prev" aria-label="Go to previous slide">
 						<svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15 7L10 12L15 17" stroke="#365314" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
 					</button>
-					<div class="blaze-pagination"></div>
+					<span id="indexEl" class="text-lg text-lime-800">1</span><span class="text-lg">/ { fmt.Sprintf("%v", len(park.Images)) }</span>
 					<button class="blaze-next" aria-label="Go to next slide">
 						<svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10 7L15 12L10 17" stroke="#365314" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
 					</button>
@@ -107,7 +130,7 @@ templ ParkInfo(park api.Park, placeName string) {
 			}
 		</div>
 	</div>
-	<span class="text-stone-400 text-xs text-center w-full block font-bold mb-8">last updated: { park.Weather[0].LastUpdated }</span>
+	<span class="text-stone-400 text-xs text-center w-full block font-bold mb-8">last updated: { lastUpdated(park.Weather[0].LastUpdated) }</span>
 
 	if placeName != "" {
 		<div class="group bg-lime-700 text-white font-mono font-extrabold text-sm max-w-3xl mx-auto md:rounded-2xl px-8 py-6 mb-8 relative">
@@ -163,23 +186,28 @@ templ ParkInfo(park api.Park, placeName string) {
 		const config = {
 			all: {
 				loop: true,
+				slideGap: '5px',
 			},
 		}
-		const slider = document.querySelector('.blaze-slider')
-		new BlazeSlider(slider, config)
+		const el = document.querySelector('.blaze-slider')
+		const slider = new BlazeSlider(el, config)
+		const indexEl = document.getElementById('indexEl')
+		slider.onSlide((pageIndex, firstVisibleSlideIndex, lastVisibleSlideIndex) => {
+			indexEl.textContent = pageIndex + 1
+		})
 	}
 	// share button
 	function share() {
 		if (navigator.share) {
 			navigator.share({
 				title: document.querySelector('h1').textContent,
-				text: document.querySelector('meta[name="description"]').content,
+				text: "Let's go on a roadtrip!",
 				url: window.location.href,
 			})
 		} else {
 			// copy url to clipboard
 			navigator.clipboard.writeText(window.location.href)
-			alert('Link is copied to clipboard.')
+			alert('Link copied to clipboard.')
 		}
 	}
 	</script>

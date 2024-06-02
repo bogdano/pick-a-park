@@ -1,0 +1,18 @@
+package components
+
+templ Offline() {
+	@DocType()
+	@Head("Offline")
+	@Body(Content())
+}
+
+templ Content() {
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1>Offline</h1>
+                <p>You are offline. Please check your internet connection.</p>
+            </div>
+        </div>
+    </div>
+}
