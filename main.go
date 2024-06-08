@@ -89,12 +89,28 @@ func main() {
 				park.DirectionsInfo = parkRecord.GetString("directionsInfo")
 				park.ParkRecordId = parkRecord.Id
 				park.ParkCode = parkCode
+				park.Campgrounds = parkRecord.GetInt("campgrounds")
+
 				var weatherData []api.WeatherDate
 				err := json.Unmarshal([]byte(parkRecord.GetString("weather")), &weatherData)
 				if err != nil {
 					log.Println("Error unmarshaling JSON:", err)
 				}
 				park.Weather = weatherData
+
+				var alerts []api.Alert
+				alertRecords, err := app.Dao().FindRecordsByExpr("alerts", dbx.HashExp{"park": parkRecord.Id})
+				if err != nil {
+					return c.String(http.StatusInternalServerError, err.Error())
+				}
+				for _, alertRecord := range alertRecords {
+					var alert api.Alert
+					alert.Title = alertRecord.GetString("title")
+					alert.Description = alertRecord.GetString("description")
+					alert.Category = alertRecord.GetString("category")
+					alert.Url = alertRecord.GetString("url")
+					alerts = append(alerts, alert)
+				}
 
 				placeName := ""
 				if queryName != "" {
@@ -111,7 +127,47 @@ func main() {
 						placeName = placeRecord.GetString("placeName")
 					}
 				}
-				return template.Html(c, components.Park(park, placeName))
+				return template.Html(c, components.Park(park, placeName, alerts))
+			} else {
+				// Redirect to home page if park not found
+				return c.Redirect(http.StatusFound, "/")
+			}
+		})
+
+		e.Router.GET("/campgrounds/:parkCode", func(c echo.Context) error {
+			parkCode := c.PathParam("parkCode")
+			parkRecord, err := app.Dao().FindFirstRecordByData("nationalParks", "parkCode", parkCode)
+			if err != nil {
+				return c.String(http.StatusInternalServerError, err.Error())
+			}
+			if parkRecord != nil {
+				var campgrounds []api.Campground
+				// get campgrounds associated with the park
+				campgroundRecords, err := app.Dao().FindRecordsByExpr("campgrounds", dbx.HashExp{"parkId": parkRecord.Id})
+				if err != nil {
+					return c.String(http.StatusInternalServerError, err.Error())
+				}
+				for _, campgroundRecord := range campgroundRecords {
+					var campground api.Campground
+					campground.Name = campgroundRecord.GetString("name")
+					if len(campgroundRecord.GetString("description")) > 100 {
+						campground.Description = campgroundRecord.GetString("description")[0:100]
+					} else {
+						campground.Description = campgroundRecord.GetString("description")
+					}
+					campground.Latitude = campgroundRecord.GetString("latitude")
+					campground.Longitude = campgroundRecord.GetString("longitude")
+					campgrounds = append(campgrounds, campground)
+				}
+				park := api.Park{
+					FullName:     parkRecord.GetString("name"),
+					States:       parkRecord.GetString("states"),
+					Longitude:    parkRecord.GetString("longitude"),
+					Latitude:     parkRecord.GetString("latitude"),
+					ParkRecordId: parkRecord.Id,
+					ParkCode:     parkCode,
+				}
+				return template.Html(c, components.Campgrounds(park, campgrounds))
 			} else {
 				// Redirect to home page if park not found
 				return c.Redirect(http.StatusFound, "/")
@@ -320,6 +376,8 @@ func main() {
 		e.Router.GET("/update-park-data", api.FetchAndStoreNationalParksHTTP(app))
 		// route to fetch weather data
 		e.Router.GET("/update-weather-data", api.FetchAndStoreWeatherHTTP(app))
+		// route to fetch alerts
+		e.Router.GET("/update-alerts", api.FetchAlertsHTTP(app))
 
 		// Start a cron that fetches and stores National Parks data once a week
 		scheduler := cron.New()
@@ -341,6 +399,16 @@ func main() {
 				return
 			}
 			log.Println("Weather data fetched and stored!")
+		})
+		// update alerts every 24 hours
+		scheduler.MustAdd("updateAlerts", "0 0 * * *", func() {
+			log.Println("Fetching and storing alerts data...")
+			err := api.FetchAlerts(app)
+			if err != nil {
+				log.Println("Error fetching alerts data:", err)
+				return
+			}
+			log.Println("Alerts data fetched and stored!")
 		})
 		scheduler.Start()
 		return nil

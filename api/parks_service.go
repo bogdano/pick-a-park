@@ -40,7 +40,15 @@ type Park struct {
 	HaversineDistance float64
 	ParkRecordId      string
 	Weather           []WeatherDate
-	Campgrounds       []Campground
+	Campgrounds       int
+	Alerts            []Alert
+}
+
+type Alert struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Category    string `json:"severity"`
+	Url         string `json:"url"`
 }
 
 type Campground struct {
@@ -150,7 +158,18 @@ func FetchAndStoreNationalParks(app *pocketbase.PocketBase) error {
 					continue
 				}
 			}
-			fetchCampgrounds(app, record.Id, park.ParkCode)
+			campCount, err := fetchCampgrounds(app, record.Id, park.ParkCode)
+			if err != nil {
+				log.Printf("Error fetching campgrounds: %v", err)
+				continue
+			}
+			form.LoadData(map[string]any{
+				"campgrounds": campCount,
+			})
+			if err := form.Submit(); err != nil {
+				log.Printf("Error saving record with image: %v", err)
+				continue
+			}
 		}
 	}
 	return nil
@@ -173,17 +192,17 @@ func quick_strip(s string) string {
 	return s
 }
 
-func fetchCampgrounds(app *pocketbase.PocketBase, parkId string, parkCode string) error {
+func fetchCampgrounds(app *pocketbase.PocketBase, parkId string, parkCode string) (count int, err error) {
 	// fetch data from NPS API
 	NPS_API_KEY := os.Getenv("NPS_API_KEY")
 	var NPS_API_URL = "https://developer.nps.gov/api/v1/campgrounds?parkCode=" + parkCode + "&api_key=" + NPS_API_KEY
 	resp, err := http.Get(NPS_API_URL)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return err
+		return 0, err
 	}
 	// decode the JSON response and get image urls from the JSON
 	var data struct {
@@ -195,11 +214,11 @@ func fetchCampgrounds(app *pocketbase.PocketBase, parkId string, parkCode string
 		} `json:"data"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return err
+		return 0, err
 	}
 	campgrounds, err := app.Dao().FindCollectionByNameOrId("campgrounds")
 	if err != nil {
-		return err
+		return 0, err
 	}
 	// save the campgrounds to the national park record
 	for _, campground := range data.Data {
@@ -257,7 +276,7 @@ func fetchCampgrounds(app *pocketbase.PocketBase, parkId string, parkCode string
 			continue
 		}
 	}
-	return nil
+	return len(data.Data), err
 }
 
 // downloadAndResizeImage downloads an image from the given URL and resizes it if it's larger than a maximum width.
@@ -405,6 +424,101 @@ func kelvinToFahrenheit(k float64) string {
 // Kelvin to Celsius
 func kelvinToCelsius(k float64) string {
 	return fmt.Sprintf("%.1f", k-273.15)
+}
+
+// fetch alerts for each national park
+func FetchParkAlerts(parkCode string) ([]Alert, error) {
+	NPS_API_KEY := os.Getenv("NPS_API_KEY")
+	var NPS_API_URL = "https://developer.nps.gov/api/v1/alerts?parkCode=" + parkCode + "&api_key=" + NPS_API_KEY
+	resp, err := http.Get(NPS_API_URL)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, err
+	}
+	var data struct {
+		Data []struct {
+			Title       string `json:"title"`
+			Description string `json:"description"`
+			Category    string `json:"category"`
+			URL         string `json:"url"`
+		} `json:"data"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	// return Alert struct
+	var alerts []Alert
+	for _, alert := range data.Data {
+		alerts = append(alerts, Alert{
+			Title:       alert.Title,
+			Description: alert.Description,
+			Category:    alert.Category,
+			Url:         alert.URL,
+		})
+	}
+	return alerts, nil
+}
+
+func FetchAlerts(app *pocketbase.PocketBase) error {
+	// remove all alerts records from collection
+	collection, err := app.Dao().FindCollectionByNameOrId("alerts")
+	if err != nil {
+		return err
+	}
+	alerts, err := app.Dao().FindRecordsByExpr(collection.Name, nil)
+	if err != nil {
+		return err
+	}
+	for _, alert := range alerts {
+		if err := app.Dao().Delete(alert); err != nil {
+			return err
+		}
+	}
+	// get all national parks
+	parks, err := app.Dao().FindRecordsByExpr("nationalParks", nil)
+	if err != nil {
+		return err
+	}
+	// fetch alerts for each park
+	for _, park := range parks {
+		parkCode := park.GetString("parkCode")
+		alerts, err := FetchParkAlerts(parkCode)
+		if err != nil {
+			log.Printf("Failed to fetch alerts for park %s: %s", parkCode, err)
+			continue
+		}
+		// save the alerts to the record
+		for _, alert := range alerts {
+			record := models.NewRecord(collection)
+			form := forms.NewRecordUpsert(app, record)
+			form.LoadData(map[string]any{
+				"title":       alert.Title,
+				"description": alert.Description,
+				"category":    alert.Category,
+				"url":         alert.Url,
+				"park":        park.Id,
+			})
+			log.Printf("Saving alert for park %s", parkCode)
+			if err := form.Submit(); err != nil {
+				log.Printf("Failed to save alert for park %s: %s", parkCode, err)
+				continue
+			}
+		}
+	}
+	return nil
+}
+
+func FetchAlertsHTTP(app *pocketbase.PocketBase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		err := FetchAlerts(app)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
+		return c.String(http.StatusOK, "Alerts data has been stored successfully.")
+	}
 }
 
 func FetchAndStoreWeatherHTTP(app *pocketbase.PocketBase) echo.HandlerFunc {

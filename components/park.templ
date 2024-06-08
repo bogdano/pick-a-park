@@ -7,10 +7,10 @@ import (
 	"time"
 )
 
-templ Park(park api.Park, placeName string) {
+templ Park(park api.Park, placeName string, alerts []api.Alert) {
 	@DocType()
 	@Head(park.FullName)
-	@Body(ParkInfo(park, placeName))
+	@Body(ParkInfo(park, placeName, alerts))
 }
 
 func trimParkName(fullName string) string {
@@ -36,14 +36,18 @@ func lastUpdated(u string) string {
 	return fmt.Sprintf("%d hr", int(updated.Hours()))	
 }
 
-templ ParkInfo(park api.Park, placeName string) {
-	<div class="flex flex-col items-center justify-center pt-12 md:mb-8 gap-4">
+script redirect(parkCode string) {
+	redirect(parkCode)
+}
+
+templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
+	<div class="flex flex-col items-center justify-center pt-12 mb-8 gap-4">
 		<a href="/" hx-boost="false" class="block">
 			<img src="/logo.webp" alt="National Parks Finder logo" class="w-36 h-36" />
 		</a>
-		<div class="flex flex-row flex-wrap gap-3 mx-3 justify-center">
-			<div class="flex flex-row justify-center gap-3 mb-4">
-				<button onclick="history.back()" class="my-auto md:hidden" id="backBtn">
+		<div class="flex flex-col md:flex-row flex-wrap gap-3 mx-3 justify-center">
+			<div class="flex flex-row justify-center gap-3 mb-4 md:hidden">
+				<button onclick="history.back()" class="my-auto " id="backBtn">
 					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
 						<title>Back</title>
 						<g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -51,15 +55,15 @@ templ ParkInfo(park api.Park, placeName string) {
 						<g id="SVGRepo_iconCarrier"> <path d="M4 10L3.29289 10.7071L2.58579 10L3.29289 9.29289L4 10ZM21 18C21 18.5523 20.5523 19 20 19C19.4477 19 19 18.5523 19 18L21 18ZM8.29289 15.7071L3.29289 10.7071L4.70711 9.29289L9.70711 14.2929L8.29289 15.7071ZM3.29289 9.29289L8.29289 4.29289L9.70711 5.70711L4.70711 10.7071L3.29289 9.29289ZM4 9L14 9L14 11L4 11L4 9ZM21 16L21 18L19 18L19 16L21 16ZM14 9C17.866 9 21 12.134 21 16L19 16C19 13.2386 16.7614 11 14 11L14 9Z" /> </g>
 					</svg>
 				</button>
-				<button onclick="share();" class="my-auto md:hidden" id="backBtn">
+				<button onclick="share();" class="my-auto ">
 					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="fill-none shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
 						<title>Share</title>
 						<g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 12C9 13.3807 7.88071 14.5 6.5 14.5C5.11929 14.5 4 13.3807 4 12C4 10.6193 5.11929 9.5 6.5 9.5C7.88071 9.5 9 10.6193 9 12Z" stroke="#15803d" stroke-width="1.5"></path> <path d="M14 6.5L9 10" stroke="#15803d" stroke-width="1.5" stroke-linecap="round"></path> <path d="M14 17.5L9 14" stroke="#15803d" stroke-width="1.5" stroke-linecap="round"></path> <path d="M19 18.5C19 19.8807 17.8807 21 16.5 21C15.1193 21 14 19.8807 14 18.5C14 17.1193 15.1193 16 16.5 16C17.8807 16 19 17.1193 19 18.5Z" stroke="#15803d" stroke-width="1.5"></path> <path d="M19 5.5C19 6.88071 17.8807 8 16.5 8C15.1193 8 14 6.88071 14 5.5C14 4.11929 15.1193 3 16.5 3C17.8807 3 19 4.11929 19 5.5Z" stroke="#15803d" stroke-width="1.5"></path> </g>
 					</svg>
 				</button>
 			</div>
-			<button onclick="history.back()" class="my-auto" id="backBtn">
-				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="hidden md:block fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
+			<button onclick="history.back()" class="my-auto hidden md:block" id="backBtn">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class=" fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
 					<title>Back</title>
 					<g id="SVGRepo_bgCarrier" stroke-width="0"/>
 					<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
@@ -70,8 +74,8 @@ templ ParkInfo(park api.Park, placeName string) {
 				<h1 class="text-4xl md:text-5xl text-center my-auto text-stone-700 font-extrabold">{park.FullName}</h1>
 				<span class="text-xl text-center self-end mb-0.5 text-stone-400 font-bold">{park.States}</span>
 			</div>
-			<button onclick="share();" class="my-auto" id="backBtn">
-				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="hidden md:block fill-none shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
+			<button onclick="share();" class="my-auto hidden md:block">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class=" fill-none shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
 					<title>Share</title>
 					<g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 12C9 13.3807 7.88071 14.5 6.5 14.5C5.11929 14.5 4 13.3807 4 12C4 10.6193 5.11929 9.5 6.5 9.5C7.88071 9.5 9 10.6193 9 12Z" stroke="#15803d" stroke-width="1.5"></path> <path d="M14 6.5L9 10" stroke="#15803d" stroke-width="1.5" stroke-linecap="round"></path> <path d="M14 17.5L9 14" stroke="#15803d" stroke-width="1.5" stroke-linecap="round"></path> <path d="M19 18.5C19 19.8807 17.8807 21 16.5 21C15.1193 21 14 19.8807 14 18.5C14 17.1193 15.1193 16 16.5 16C17.8807 16 19 17.1193 19 18.5Z" stroke="#15803d" stroke-width="1.5"></path> <path d="M19 5.5C19 6.88071 17.8807 8 16.5 8C15.1193 8 14 6.88071 14 5.5C14 4.11929 15.1193 3 16.5 3C17.8807 3 19 4.11929 19 5.5Z" stroke="#15803d" stroke-width="1.5"></path> </g>
 				</svg>
@@ -133,7 +137,7 @@ templ ParkInfo(park api.Park, placeName string) {
 	<span class="text-stone-400 text-xs text-center w-full block font-bold mb-8">last updated: { lastUpdated(park.Weather[0].LastUpdated) }</span>
 
 	if placeName != "" {
-		<div class="group bg-lime-700 text-white font-mono font-extrabold text-sm max-w-3xl mx-auto md:rounded-2xl px-8 py-6 mb-8 relative">
+		<div id="directions" class="group bg-lime-700 text-white font-mono font-extrabold text-sm max-w-3xl mx-auto md:rounded-2xl px-8 py-6 mb-8 relative">
 			<div class="flex flex-col md:flex-row justify-between w-full items-center">
 				<div class="text-center font-bold md:text-lg">
 					<span>{ strings.Split(placeName, ",")[0] + ", " + strings.Split(placeName, ",")[1] }</span>
@@ -161,21 +165,57 @@ templ ParkInfo(park api.Park, placeName string) {
 					<span>{ trimParkName(park.FullName) }</span>
 				</div>
 			</div>
-			<a href={ templ.SafeURL(fmt.Sprintf("/park/%s", park.ParkCode)) } class="opacity-0 group-hover:opacity-100 absolute right-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-red-500 hover:bg-red-700">
-				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-6 h-6 fill-current stroke-current">
+			<button onclick={ redirect(park.ParkCode) } class="opacity-0 group-hover:opacity-100 absolute right-2 top-2 p-1 rounded-full bg-red-700 hover:bg-red-900">
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-4 h-4 fill-current stroke-current">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
 				</svg>
-			</a>
+			</button>
 		</div>
 	}
-	<div id="description" class="text-center text-stone-700 text-lg max-w-4xl mx-4 md:mx-auto mb-24">
+	<div id="description" class="text-center text-stone-700 text-lg max-w-4xl mx-4 md:mx-auto mb-8">
 		{park.DirectionsInfo}
 	</div>
+	
+	if park.Campgrounds > 0 {
+		<a 	href={ templ.SafeURL(fmt.Sprintf("/campgrounds/%s", park.ParkCode)) }
+			class="block w-72 mx-auto mb-8 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
+			View Campgrounds
+	</a>
+	}
+	if len(alerts) > 0 {
+		<div class="flex flex-col items-center gap-4 mb-24">
+			<span class="text-stone-600 font-bold text-2xl">Alerts</span>
+			<div class="max-w-3xl mx-auto">
+				for _, alert := range alerts {
+					<div class={"p-4 rounded-2xl mb-4 relative group", 
+								templ.KV("bg-red-100 text-red-800", alert.Category == "Danger" || alert.Category == "Park Closure"),
+								templ.KV("bg-amber-100 text-amber-800", alert.Category == "Caution"),
+								templ.KV("bg-green-100 text-green-800", alert.Category == "Information"),
+								templ.KV("bg-fuchsia-100 text-fuchsia-800", alert.Category != "Information" && alert.Category != "Caution" && alert.Category != "Danger" && alert.Category != "Park Closure")}>
+						<p class="text-lg">{strings.ToUpper(alert.Category)}</p>
+						<p class="font-bold text-base">{alert.Title}</p>
+						<p class="text-sm mb-4">{alert.Description}</p>
+						if alert.Url != "" {
+							<a href={ templ.SafeURL(fmt.Sprintf(alert.Url)) } class="font-bold text-sm absolute right-4 bottom-4 group-hover:underline">more</a>
+						}
+					</div>
+				}
+			</div>
+		</div>
+	}
 
 	<script>
+	// redirect to park page
+	function redirect(parkCode) {
+		directions = document.getElementById('directions')
+		directions.style.display = 'none'
+		// change url without reload
+		history.pushState({}, '', `/park/${parkCode}`)
+	}
 	// domcontentloaded listener to hide back button if there is no history (if park opened in new tab)
 	document.addEventListener('DOMContentLoaded', () => {
 		const backBtn = document.getElementById('backBtn')
+		if (!backBtn) return
 		if (window.history.length === 1) {
 			backBtn.style.display = 'none'
 		}
