@@ -3,6 +3,7 @@ package components
 import (
     "go-htmx/api"
     "fmt"
+    "strings"
 )
 
 templ Campgrounds(park api.Park, campgrounds []api.Campground) {
@@ -53,15 +54,15 @@ templ CampgroundsInfo(park api.Park, campgrounds []api.Campground) {
 		</div>
 	</div>
 
-    <div class="flex flex-col items-center justify-center gap-4 mb-8">
-        for _, campground := range(campgrounds) {
-            <div class="flex flex-col items-center justify-center gap-4">
-                <div class="flex flex-col items-center justify-center gap-4">
-                    <h2 class="text-2xl text-center my-auto text-stone-700 font-bold">{campground.Name}</h2>
-                    <p class="text-lg text-center my-auto text-stone-700">{campground.Description}</p>
+    <div class="flex flex-col items-center gap-4 mb-24">
+        <div class="max-w-3xl mx-auto">
+            for _, campground := range campgrounds {
+                <div class={ "p-4 rounded-2xl mb-4 relative group bg-amber-100", templ.KV("bg-green-100", campground.FirstComeFirstServe != "0") }>
+                    <p class="text-xl">{ strings.ToUpper(campground.Name) }</p>
+                    <p class="text-sm mb-4">{ campground.Description }...</p>
                 </div>
-            </div>
-        }
+            }
+        </div>
     </div>
 
     <a  href={ templ.SafeURL(fmt.Sprintf("https://www.nps.gov/%s/planyourvisit/", park.ParkCode))}

@@ -137,7 +137,7 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 	<span class="text-stone-400 text-xs text-center w-full block font-bold mb-8">last updated: { lastUpdated(park.Weather[0].LastUpdated) }</span>
 
 	if placeName != "" {
-		<div id="directions" class="group bg-lime-700 text-white font-mono font-extrabold text-sm max-w-3xl mx-auto md:rounded-2xl px-8 py-6 mb-8 relative">
+		<div id="directions" class="group bg-lime-700 text-white font-mono font-extrabold text-sm max-w-3xl mx-auto md:rounded-2xl px-8 py-6 mb-4 relative">
 			<div class="flex flex-col md:flex-row justify-between w-full items-center">
 				<div class="text-center font-bold md:text-lg">
 					<span>{ strings.Split(placeName, ",")[0] + ", " + strings.Split(placeName, ",")[1] }</span>
@@ -172,19 +172,20 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 			</button>
 		</div>
 	}
-	<div id="description" class="text-center text-stone-700 text-lg max-w-4xl mx-4 md:mx-auto mb-8">
-		{park.DirectionsInfo}
-	</div>
-	
 	if park.Campgrounds > 0 {
 		<a 	href={ templ.SafeURL(fmt.Sprintf("/campgrounds/%s", park.ParkCode)) }
 			class="block w-72 mx-auto mb-8 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
 			View Campgrounds
-	</a>
+		</a>
 	}
+	
+	<div id="description" class="text-center text-stone-700 text-lg max-w-4xl mx-4 md:mx-auto mb-8">
+		{park.DirectionsInfo}
+	</div>
+	
 	if len(alerts) > 0 {
 		<div class="flex flex-col items-center gap-4 mb-24">
-			<span class="text-stone-600 font-bold text-2xl">Alerts</span>
+			<span class="text-white bg-red-900 px-4 py-1 font-bold text-2xl rounded">Alerts</span>
 			<div class="max-w-3xl mx-auto">
 				for _, alert := range alerts {
 					<div class={"p-4 rounded-2xl mb-4 relative group", 

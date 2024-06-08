@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -231,6 +232,8 @@ func fetchCampgrounds(app *pocketbase.PocketBase, parkId string, parkCode string
 			record = models.NewRecord(campgrounds)
 		}
 		form := forms.NewRecordUpsert(app, record)
+		reservable, _ := strconv.Atoi(campground.Reservable)
+		firstComeFirstServe, _ := strconv.Atoi(campground.FirstComeFirstServe)
 		form.LoadData(map[string]any{
 			"name":                campground.Name,
 			"parkId":              parkId,
@@ -241,8 +244,8 @@ func fetchCampgrounds(app *pocketbase.PocketBase, parkId string, parkCode string
 			"reservationUrl":      campground.ReservationURL,
 			"directionsOverview":  campground.DirectionsOverview,
 			"weatherOverview":     campground.WeatherOverview,
-			"reservable":          campground.Reservable,
-			"firstComeFirstServe": campground.FirstComeFirstServe,
+			"reservable":          reservable,
+			"firstComeFirstServe": firstComeFirstServe,
 		})
 		form.RemoveFiles("images")
 		// fetch images for each campground

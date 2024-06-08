@@ -45,7 +45,7 @@ func main() {
 		template.NewTemplateRenderer(e.Router)
 
 		// set to ./pb_public when running locally
-		e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS("pb_public"), false))
+		e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS("/pb/pb_public"), false))
 
 		e.Router.GET("/", func(c echo.Context) error {
 			parks := []api.Park{}
@@ -157,6 +157,7 @@ func main() {
 					}
 					campground.Latitude = campgroundRecord.GetString("latitude")
 					campground.Longitude = campgroundRecord.GetString("longitude")
+					campground.FirstComeFirstServe = campgroundRecord.GetString("firstComeFirstServe")
 					campgrounds = append(campgrounds, campground)
 				}
 				park := api.Park{

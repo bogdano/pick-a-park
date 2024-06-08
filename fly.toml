@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for nps-go on 2024-05-06T19:14:27-06:00
+# fly.toml app configuration file generated for pick-a-park on 2024-06-07T21:01:59-06:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'nps-go'
+app = 'pick-a-park'
 primary_region = 'sea'
 
 [build]
