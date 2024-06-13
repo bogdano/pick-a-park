@@ -37,7 +37,7 @@ templ Head(title string) {
 
 templ Body(component templ.Component) {
 	<body class="htmx-body mx-auto w-full min-h-lvh relative bg-white dark:bg-stone-900" hx-boost="true" hx-swap="innerHTML transition:true" hx-indicator=".loading-bar">
-		<div class="absolute top-4 right-4">
+		<div class="absolute top-6 right-6 md:top-8 md:right-8">
 			<button class="gear-button" onclick="toggleModal();">
 				<svg xmlns="http://www.w3.org/2000/svg" class="dark:text-white h-8 w-8 text-stone-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -45,23 +45,35 @@ templ Body(component templ.Component) {
 				</svg>
 			</button>
 		</div>
-		<div id="settingsModal" class="hidden fixed inset-0 z-50 bg-gray-500 bg-opacity-50 backdrop-filter backdrop-grayscale flex items-center justify-center p-4">
-			<div class="bg-white py-4 px-10 rounded-2xl shadow-lg mx-auto">
-				<h2 class="text-lg font-bold mb-4 text-center">Settings</h2>
-				<div>
-					<label class="flex items-center space-x-3">
-						<input type="checkbox" id="darkModeToggle" class="h-5 w-5" />
-						<span class="text-gray-700">Dark Mode</span>
-					</label>
+		<div id="settingsModal" class="dark:bg-stone-950 dark:bg-opacity-50 hidden fixed inset-0 z-50 bg-stone-500 bg-opacity-50 backdrop-filter backdrop-grayscale flex items-center justify-center p-4">
+			<div class="dark:bg-stone-800 dark:border dark:border-stone-400 bg-white rounded-2xl shadow-lg mx-auto">
+				<div onclick="toggleModal()" class="dark:border-stone-400 cursor-pointer dark:bg-stone-700 group bg-amber-50 rounded-t-2xl flex flex-row px-4 py-3 justify-between items-center border-b w-full align-middle">
+					<h2 class="dark:text-amber-100 text-stone-700 text-lg font-bold text-center">Settings</h2>
+					<button onclick="event.preventDefault(); event.stopPropagation(); toggleModal()" class="group-hover:bg-red-800 px-2 py-1 bg-red-500 hover:bg-red-700 rounded-full text-white text-sm">✕</button>
 				</div>
-				<div class="mt-4">
-					<label class="flex items-center space-x-3">
-						<input type="checkbox" id="unitToggle" class="h-5 w-5" />
-						<span class="text-gray-700">Use Imperial Units</span>
+				<div class="flex flex-col gap-6 py-8 justify-center">
+					<label class="flex px-8 space-x-3 justify-center cursor-pointer">
+						<svg xmlns="http://www.w3.org/2000/svg" class="dark:fill-amber-50 fill-stone-700 w-6 h-6" viewBox="0 0 24 24">
+							<path fill-rule="evenodd" clip-rule="evenodd" d="M8 12C8 9.79086 9.79086 8 12 8C14.2091 8 16 9.79086 16 12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12Z" />
+							<path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C12.5523 2 13 2.44772 13 3V5C13 5.55228 12.5523 6 12 6C11.4477 6 11 5.55228 11 5V3C11 2.44772 11.4477 2 12 2Z" />
+							<path fill-rule="evenodd" clip-rule="evenodd" d="M19.7071 4.29289C20.0976 4.68342 20.0976 5.31658 19.7071 5.70711L17.7071 7.70711C17.3166 8.09763 16.6834 8.09763 16.2929 7.70711C15.9024 7.31658 15.9024 6.68342 16.2929 6.29289L18.2929 4.29289C18.6834 3.90237 19.3166 3.90237 19.7071 4.29289Z" />
+							<path fill-rule="evenodd" clip-rule="evenodd" d="M18 12C18 11.4477 18.4477 11 19 11H21C21.5523 11 22 11.4477 22 12C22 12.5523 21.5523 13 21 13H19C18.4477 13 18 12.5523 18 12Z" />
+							<path fill-rule="evenodd" clip-rule="evenodd" d="M16.2929 16.2929C16.6834 15.9024 17.3166 15.9024 17.7071 16.2929L19.7071 18.2929C20.0976 18.6834 20.0976 19.3166 19.7071 19.7071C19.3166 20.0976 18.6834 20.0976 18.2929 19.7071L16.2929 17.7071C15.9024 17.3166 15.9024 16.6834 16.2929 16.2929Z" />
+							<path fill-rule="evenodd" clip-rule="evenodd" d="M12 18C12.5523 18 13 18.4477 13 19V21C13 21.5523 12.5523 22 12 22C11.4477 22 11 21.5523 11 21V19C11 18.4477 11.4477 18 12 18Z" />
+							<path fill-rule="evenodd" clip-rule="evenodd" d="M7.70711 16.2929C8.09763 16.6834 8.09763 17.3166 7.70711 17.7071L5.70711 19.7071C5.31658 20.0976 4.68342 20.0976 4.29289 19.7071C3.90237 19.3166 3.90237 18.6834 4.29289 18.2929L6.29289 16.2929C6.68342 15.9024 7.31658 15.9024 7.70711 16.2929Z" />
+							<path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 11.4477 2.44772 11 3 11H5C5.55228 11 6 11.4477 6 12C6 12.5523 5.55228 13 5 13H3C2.44772 13 2 12.5523 2 12Z" />
+							<path fill-rule="evenodd" clip-rule="evenodd" d="M4.29289 4.29289C4.68342 3.90237 5.31658 3.90237 5.70711 4.29289L7.70711 6.29289C8.09763 6.68342 8.09763 7.31658 7.70711 7.70711C7.31658 8.09763 6.68342 8.09763 6.29289 7.70711L4.29289 5.70711C3.90237 5.31658 3.90237 4.68342 4.29289 4.29289Z" />
+						</svg>
+						<input type="checkbox" id="darkModeToggle" class="" />
+						<svg xmlns="http://www.w3.org/2000/svg" class="dark:fill-amber-50 fill-stone-700 w-6 h-6" viewBox="0 0 24 24">
+							<path d="M12 22C17.5228 22 22 17.5228 22 12C22 11.5373 21.3065 11.4608 21.0672 11.8568C19.9289 13.7406 17.8615 15 15.5 15C11.9101 15 9 12.0899 9 8.5C9 6.13845 10.2594 4.07105 12.1432 2.93276C12.5392 2.69347 12.4627 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" />
+						</svg>
 					</label>
-				</div>
-				<div class="mt-6 text-center">
-					<button onclick="toggleModal()" class="px-4 py-2 bg-red-500 hover:bg-red-700 rounded text-white">Close</button>
+					<label class="flex px-8 space-x-3 justify-center cursor-pointer">
+						<span class="dark:text-amber-50 font-mono text-gray-700">km | °C</span>
+						<input type="checkbox" id="unitToggle" class="" />
+						<span class="dark:text-amber-50 font-mono text-gray-700">mi | °F</span>
+					</label>
 				</div>
 			</div>
 		</div>
@@ -91,10 +103,10 @@ templ Body(component templ.Component) {
 		// Load settings from local storage
 		if (typeof(darkMode) === 'undefined' || typeof(units) === 'undefined'){
 			const darkMode = localStorage.getItem('darkMode') === 'true';
-			const units = localStorage.getItem('units') === 'true';
+			const units = localStorage.getItem('units') === 'false';
 			if (darkMode) document.documentElement.classList.add('dark');
 			document.getElementById('darkModeToggle').checked = darkMode;
-			document.getElementById('unitToggle').checked = units;
+			document.getElementById('unitToggle').checked = !units;
 			updateUnits();
 		}
 
@@ -118,10 +130,10 @@ templ Body(component templ.Component) {
 		});
 
 		function updateUnits() {
-			let units = localStorage.getItem('units') === 'true';
+			let units = localStorage.getItem('units') === 'false';
 			let distances = document.querySelectorAll('.distance')
 			let temperatures = document.querySelectorAll('.temperature')
-			if (!units) {
+			if (units) {
 				distances.forEach(function(distance) {
 					distance.innerHTML = distance.getAttribute('distance-km') + ' km'
 				})

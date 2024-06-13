@@ -16,7 +16,7 @@ templ pageIndex(parks []api.Park, placeName string, state string) {
 		<a href="/" hx-boost="false" class="block">
 			<div class="flex flex-col items-center justify-center mx-3 gap-4 mb-8">
 				<img src="/logo.webp" alt="Pick A Park Logo" class="w-36 h-36" />
-				<h1 class="dark:text-white text-4xl md:text-5xl font-extrabold text-stone-700">Pick A Park</h1>
+				<h1 class="dark:text-amber-100 text-4xl md:text-5xl font-extrabold text-stone-700">Pick A Park</h1>
 			</div>
 		</a>
 		<div id="geocoder" class="geocoder"></div>
@@ -33,10 +33,10 @@ templ pageIndex(parks []api.Park, placeName string, state string) {
 			hx-swap="beforeend" 
 			hx-push-url="false"
 			hx-boost="false"
-			class="block w-72 mx-auto mb-8 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
-			Load More Parks
+			class="block w-64 mx-auto mb-8 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
+			Load More
 		</button>
-		<p class="dark:text-white text-xs mb-4 text-center"><sup class="dark:text-lime-400 text-base text-lime-800">*</sup> Parks are sorted by as-the-crow-flies distance from your location, and thus may not be sorted by driving distance.</p>
+		<p class="dark:text-white text-xs mb-4 text-center mx-8"><sup class="dark:text-lime-400 text-base text-lime-800">*</sup> Parks are sorted by as-the-crow-flies distance from your location, and thus may not be sorted by driving distance.</p>
 	}
 
 	<script>

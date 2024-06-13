@@ -48,7 +48,7 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 		<div class="flex flex-col md:flex-row flex-wrap gap-3 mx-3 justify-center">
 			<div class="flex flex-row justify-center gap-3 mb-4 md:hidden">
 				<button onclick="history.back()" class="my-auto " id="backBtn">
-					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:fill-white dark:border-lime-400 fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
+					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:fill-white dark:hover:bg-lime-900 fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
 						<title>Back</title>
 						<g id="SVGRepo_bgCarrier" stroke-width="0"/>
 						<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
@@ -56,14 +56,14 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 					</svg>
 				</button>
 				<button onclick="share();" class="my-auto ">
-					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:text-white dark:hover:bg-lime-800 dark:bg-lime-950 dark:border-lime-400 text-lime-700 fill-none shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100" stroke="currentColor">
+					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:text-white dark:hover:bg-lime-800 dark:bg-lime-950 dark:hover:bg-lime-900 text-lime-700 fill-none shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100" stroke="currentColor">
 						<title>Share</title>
 						<g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 12C9 13.3807 7.88071 14.5 6.5 14.5C5.11929 14.5 4 13.3807 4 12C4 10.6193 5.11929 9.5 6.5 9.5C7.88071 9.5 9 10.6193 9 12Z" stroke-width="1.5"></path> <path d="M14 6.5L9 10" stroke-width="1.5" stroke-linecap="round"></path> <path d="M14 17.5L9 14" stroke-width="1.5" stroke-linecap="round"></path> <path d="M19 18.5C19 19.8807 17.8807 21 16.5 21C15.1193 21 14 19.8807 14 18.5C14 17.1193 15.1193 16 16.5 16C17.8807 16 19 17.1193 19 18.5Z" stroke-width="1.5"></path> <path d="M19 5.5C19 6.88071 17.8807 8 16.5 8C15.1193 8 14 6.88071 14 5.5C14 4.11929 15.1193 3 16.5 3C17.8807 3 19 4.11929 19 5.5Z" stroke-width="1.5"></path> </g>
 					</svg>
 				</button>
 			</div>
 			<button onclick="history.back()" class="my-auto hidden md:block" id="backBtn">
-				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:fill-white dark:border-lime-400  fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:fill-white dark:hover:bg-lime-900  fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
 					<title>Back</title>
 					<g id="SVGRepo_bgCarrier" stroke-width="0"/>
 					<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
@@ -71,11 +71,11 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 				</svg>
 			</button>
 			<div class="flex flex-row justify-center flex-wrap gap-3">
-				<h1 class="dark:text-white text-4xl md:text-5xl text-center my-auto text-stone-700 font-extrabold">{park.FullName}</h1>
+				<h1 class="dark:text-amber-100 text-4xl md:text-5xl text-center my-auto text-stone-700 font-extrabold">{park.FullName}</h1>
 				<span class="text-xl text-center self-end mb-0.5 text-stone-400 font-bold">{park.States}</span>
 			</div>
 			<button onclick="share();" class="my-auto hidden md:block">
-				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:border-lime-400 dark:text-white text-lime-700 fill-none shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100" stroke="currentColor">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:hover:bg-lime-900 dark:text-white text-lime-700 fill-none shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100" stroke="currentColor">
 					<title>Share</title>
 					<g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 12C9 13.3807 7.88071 14.5 6.5 14.5C5.11929 14.5 4 13.3807 4 12C4 10.6193 5.11929 9.5 6.5 9.5C7.88071 9.5 9 10.6193 9 12Z" stroke-width="1.5"></path> <path d="M14 6.5L9 10" stroke-width="1.5" stroke-linecap="round"></path> <path d="M14 17.5L9 14" stroke-width="1.5" stroke-linecap="round"></path> <path d="M19 18.5C19 19.8807 17.8807 21 16.5 21C15.1193 21 14 19.8807 14 18.5C14 17.1193 15.1193 16 16.5 16C17.8807 16 19 17.1193 19 18.5Z" stroke-width="1.5"></path> <path d="M19 5.5C19 6.88071 17.8807 8 16.5 8C15.1193 8 14 6.88071 14 5.5C14 4.11929 15.1193 3 16.5 3C17.8807 3 19 4.11929 19 5.5Z" stroke-width="1.5"></path> </g>
 				</svg>
@@ -194,11 +194,11 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 			<span class="text-white bg-red-900 px-4 py-1 font-bold text-2xl rounded">Alerts</span>
 			<div class="max-w-3xl mx-auto">
 				for _, alert := range alerts {
-					<div class={"p-4 rounded-2xl mb-4 relative group", 
-								templ.KV("bg-red-100 text-red-800", alert.Category == "Danger" || alert.Category == "Park Closure"),
-								templ.KV("bg-amber-100 text-amber-800", alert.Category == "Caution"),
-								templ.KV("bg-green-100 text-green-800", alert.Category == "Information"),
-								templ.KV("bg-fuchsia-100 text-fuchsia-800", alert.Category != "Information" && alert.Category != "Caution" && alert.Category != "Danger" && alert.Category != "Park Closure")}>
+					<div class={"p-4 md:rounded-2xl mb-2 md:mb-4 relative group", 
+								templ.KV("dark:bg-red-700 dark:bg-opacity-60 dark:text-red-100 bg-red-100 text-red-800", alert.Category == "Danger" || alert.Category == "Park Closure"),
+								templ.KV("dark:bg-amber-700 dark:bg-opacity-80 dark:text-amber-100 bg-amber-100 text-amber-800", alert.Category == "Caution"),
+								templ.KV("dark:bg-green-900 dark:text-green-100 bg-green-100 text-green-800", alert.Category == "Information"),
+								templ.KV("dark:bg-fuchsia-900 dark:text-fuchsia-100 bg-fuchsia-100 text-fuchsia-800", alert.Category != "Information" && alert.Category != "Caution" && alert.Category != "Danger" && alert.Category != "Park Closure")}>
 						<p class="text-lg">{strings.ToUpper(alert.Category)}</p>
 						<p class="font-bold text-base">{alert.Title}</p>
 						<p class="text-sm mb-4">{alert.Description}</p>

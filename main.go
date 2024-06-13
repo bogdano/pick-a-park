@@ -162,6 +162,7 @@ func main() {
 					} else {
 						campground.Description = campgroundRecord.GetString("description")
 					}
+					campground.Id = campgroundRecord.GetString("campId")
 					campground.Latitude = campgroundRecord.GetString("latitude")
 					campground.Longitude = campgroundRecord.GetString("longitude")
 					campground.FirstComeFirstServe = campgroundRecord.GetString("firstComeFirstServe")
@@ -180,6 +181,37 @@ func main() {
 				// Redirect to home page if park not found
 				return c.Redirect(http.StatusFound, "/")
 			}
+		})
+
+		e.Router.GET("/campground/:campId", func(c echo.Context) error {
+			campId := c.PathParam("campId")
+			campgroundRecord, err := app.Dao().FindFirstRecordByData("campgrounds", "campId", campId)
+			if err != nil {
+				return c.String(http.StatusInternalServerError, err.Error())
+			}
+			if campgroundRecord != nil {
+				var campground api.Campground
+				campground.Name = campgroundRecord.GetString("name")
+				campground.Description = campgroundRecord.GetString("description")
+				campground.Id = campgroundRecord.GetString("campId")
+				campground.Latitude = campgroundRecord.GetString("latitude")
+				campground.Longitude = campgroundRecord.GetString("longitude")
+				campground.FirstComeFirstServe = campgroundRecord.GetString("firstComeFirstServe")
+				campground.Reservable = campgroundRecord.GetString("reservable")
+				campground.ReservationInfo = campgroundRecord.GetString("reservationInfo")
+				campground.ReservationURL = campgroundRecord.GetString("reservationURL")
+				campground.DirectionsOverview = campgroundRecord.GetString("directionsOverview")
+				campground.Images = campgroundRecord.GetStringSlice("images")
+				campground.WeatherOverview = campgroundRecord.GetString("weatherOverview")
+				park, err := app.Dao().FindRecordById("nationalParks", campgroundRecord.GetString("parkId"))
+				if err != nil {
+					return c.String(http.StatusInternalServerError, err.Error())
+				}
+				campground.ParkCode = park.GetString("parkCode")
+				parkName := park.GetString("name")
+				return template.Html(c, components.Campground(campground, parkName))
+			}
+			return template.Html(c, components.Error(404, "Campground not found"))
 		})
 
 		e.Router.GET("/place/:placeName/:stateName", func(c echo.Context) error {
