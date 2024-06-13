@@ -1,19 +1,18 @@
-package components
+package components;
 
-templ Offline() {
-	@DocType()
-	@Head("Offline")
-	@Body(Content())
+templ Error(code int, err string) {
+    @DocType()
+	@Head("Error | " + err)
+	@Body(ErrorContent(code, err))
 }
 
-templ Content() {
+templ ErrorContent(code int, err string) {
     <div class="h-screen flex justify-center items-center">
         <div class="flex flex-col items-center">
             <a href="/" hx-boost="false" class="block">
                 <div class="flex flex-col items-center justify-center gap-4 mb-8">
                     <img src="/logo.webp" alt="Pick A Park Logo" class="w-36 h-36" />
-                    <h1 class="text-4xl md:text-5xl font-extrabold text-stone-700 mb-8">Offline</h1>
-                    <p class="text-center text-lg md:text-xl text-stone-600">You are offline. Please check your internet connection and try again.</p>
+                    <h1 class="text-4xl md:text-5xl font-extrabold text-stone-700">{ err }</h1>
                 </div>
             </a>
         </div>

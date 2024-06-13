@@ -17,10 +17,15 @@ templ ParkCard(park api.Park, placeName string, stateName string) {
             </div>
             <div class="flex flex-col text-pretty px-2 py-4">
                 <span class="font-bold text-lg">{ park.FullName }</span> 
-                <span class="font-bold text-stone-500 group-hover:text-white">{ park.DrivingDistance } 
-                if park.DrivingDistance != "ocean" {
-                    { ", " + park.DriveTime} 
-                }</span>
+                <div class="flex flex-row mx-auto">
+                    <span class="distance font-bold text-stone-500 group-hover:text-white"
+                        distance-km={ park.DrivingDistanceKm }
+                        distance-mi={ park.DrivingDistanceMi }></span><span class="font-bold text-stone-500 group-hover:text-white">
+                        if park.DrivingDistanceMi != "ocean" {
+                            { ", " + park.DriveTime + " hr" } 
+                        }
+                    </span>
+                </div>
             </div>
         </div>
     </a>

@@ -127,8 +127,12 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 					<span class="text-sm text-stone-700">{date.Date}</span>
 					<img src={ date.WeatherIcon } alt="Weather icon" class="w-16 h-16" loading="lazy" />
 					<div class="flex flex-col items-center gap-1">
-						<span class="text-xs text-stone-700 font-bold">{date.TemperatureDayF}°F</span>
-						<span class="text-xs text-stone-700 font-bold">{date.TemperatureNightF}°F</span>
+						<span class="temperature text-xs text-stone-700 font-bold"
+							  temp-C={ date.TemperatureDayC + "°C" }
+							  temp-F={ date.TemperatureDayF + "°F" }></span>
+						<span class="temperature text-xs text-stone-700 font-bold"
+							  temp-C={ date.TemperatureNightC + "°C" }
+							  temp-F={ date.TemperatureNightF + "°F" }></span>
 					</div>
 				</div>
 			}
@@ -143,7 +147,9 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 					<span>{ strings.Split(placeName, ",")[0] + ", " + strings.Split(placeName, ",")[1] }</span>
 				</div>
 				<a href={ templ.SafeURL(fmt.Sprintf("/park/%s", park.ParkCode)) } class="block flex-grow flex flex-col items-center mx-2 text-center">
-					<span class="md:text-sm text-xs text-nowrap font-extrabold mb-2">{ park.DrivingDistance }</span>
+					<span class="distance md:text-sm text-xs text-nowrap font-extrabold mb-2"
+						  distance-mi={ park.DrivingDistanceMi }
+						  distance-km={ park.DrivingDistanceKm }></span>
 					<div class="w-full flex items-center justify-center">
 						<div class="flex-grow border-t-2 border-white border-dashed hidden md:flex"></div>
 						<svg viewBox="0 0 24 24" class="w-6 h-6 fill-current ml-2 hidden md:block" xmlns="http://www.w3.org/2000/svg">
@@ -155,7 +161,7 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 					</div>
 					<span class="md:text-sm text-xs text-nowrap font-extrabold mt-2">
 						if park.DriveTime != "" {
-							{ park.DriveTime } 
+							{ park.DriveTime + " hr" } 
 						} else {
 							unreachable
 						}

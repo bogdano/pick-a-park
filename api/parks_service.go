@@ -37,7 +37,8 @@ type Park struct {
 	DirectionsInfo    string   `json:"directionsInfo"`
 	WeatherInfo       string   `json:"weatherInfo"`
 	DriveTime         string
-	DrivingDistance   string
+	DrivingDistanceMi string
+	DrivingDistanceKm string
 	HaversineDistance float64
 	ParkRecordId      string
 	Weather           []WeatherDate
@@ -53,6 +54,7 @@ type Alert struct {
 }
 
 type Campground struct {
+	Id                  string   `json:"id"`
 	Name                string   `json:"name"`
 	ParkCode            string   `json:"parkCode"`
 	Description         string   `json:"description"`
@@ -111,6 +113,7 @@ func FetchAndStoreNationalParks(app *pocketbase.PocketBase) error {
 			if err == nil {
 				record = existingRecord
 			} else {
+				log.Printf("Creating new record for park %s", park.ParkCode)
 				record = models.NewRecord(collection)
 				record.Set("parkCode", park.ParkCode)
 			}
@@ -225,10 +228,11 @@ func fetchCampgrounds(app *pocketbase.PocketBase, parkId string, parkCode string
 	for _, campground := range data.Data {
 		var record *models.Record
 		// Check if the campground already exists
-		existingCampground, err := app.Dao().FindFirstRecordByData("campgrounds", "name", campground.Name)
+		existingCampground, err := app.Dao().FindFirstRecordByData("campgrounds", "campId", campground.Id)
 		if err == nil {
 			record = existingCampground
 		} else {
+			log.Printf("Creating new record for campground %s, err: %v", campground.Id, err)
 			record = models.NewRecord(campgrounds)
 		}
 		form := forms.NewRecordUpsert(app, record)
@@ -246,11 +250,22 @@ func fetchCampgrounds(app *pocketbase.PocketBase, parkId string, parkCode string
 			"weatherOverview":     campground.WeatherOverview,
 			"reservable":          reservable,
 			"firstComeFirstServe": firstComeFirstServe,
+			"campId":              campground.Id,
 		})
-		form.RemoveFiles("images")
+		current_images := record.GetStringSlice("images")
+		// form.RemoveFiles("images")
 		// fetch images for each campground
+	ImageLoop:
 		for _, image := range campground.Images {
 			imageURL := image.URL
+			// check if the image is already in the form
+			for _, existingImage := range current_images {
+				if inflector.Snakecase(quick_strip_url(imageURL)) == quick_strip(existingImage) {
+					log.Print("skipped camp image")
+					continue ImageLoop
+				}
+			}
+
 			// resize the image using my helper function
 			resizedImageBytes, err := downloadAndResizeImage(imageURL, 1500)
 			if err != nil {
@@ -536,10 +551,12 @@ func FetchAndStoreWeatherHTTP(app *pocketbase.PocketBase) echo.HandlerFunc {
 
 func FetchAndStoreNationalParksHTTP(app *pocketbase.PocketBase) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		log.Printf("=============== FETCHING NATIONAL PARKS DATA ===============")
 		err := FetchAndStoreNationalParks(app)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
+		log.Printf("============= National Parks data has been stored successfully. ==============")
 		return c.String(http.StatusOK, "National Parks data has been stored successfully.")
 	}
 }

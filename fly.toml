@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for pick-a-park on 2024-06-07T21:01:59-06:00
+# fly.toml app configuration file generated for pick-a-park on 2024-06-12T16:28:36-06:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -13,14 +13,14 @@ primary_region = 'sea'
 
 [[mounts]]
   source = 'pb_data'
-  destination = '/pb/pb_data'
+  destination = 'pb_data'
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = false
+  auto_stop_machines = true
   auto_start_machines = true
-  min_machines_running = 1
+  min_machines_running = 0
   processes = ['app']
 
 [[vm]]

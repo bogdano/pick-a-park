@@ -64,10 +64,11 @@ func FetchDrivingDistances(startCoordinates [2]float64, parksData []Park, count 
 	for i := range parksData {
 		if response.Durations[0][i+1] == 0.0 {
 			parksData[i].DriveTime = ""
-			parksData[i].DrivingDistance = "ocean"
+			parksData[i].DrivingDistanceMi, parksData[i].DrivingDistanceKm = "ocean", "ocean"
 		} else {
-			parksData[i].DriveTime = convertSeconds(response.Durations[0][i+1]) + " hr"
-			parksData[i].DrivingDistance = convertMetres(response.Distances[0][i+1], false) + " mi" // +1 to skip the start location
+			parksData[i].DriveTime = convertSeconds(response.Durations[0][i+1])
+			parksData[i].DrivingDistanceMi = convertMetres(response.Distances[0][i+1], true)  // +1 to skip the start location
+			parksData[i].DrivingDistanceKm = convertMetres(response.Distances[0][i+1], false) // +1 to skip the start location
 		}
 	}
 	return parksData[:count], nil
