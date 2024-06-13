@@ -48,7 +48,7 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 		<div class="flex flex-col md:flex-row flex-wrap gap-3 mx-3 justify-center">
 			<div class="flex flex-row justify-center gap-3 mb-4 md:hidden">
 				<button onclick="history.back()" class="my-auto " id="backBtn">
-					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
+					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:fill-white dark:border-lime-400 fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
 						<title>Back</title>
 						<g id="SVGRepo_bgCarrier" stroke-width="0"/>
 						<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
@@ -56,14 +56,14 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 					</svg>
 				</button>
 				<button onclick="share();" class="my-auto ">
-					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="fill-none shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
+					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:text-white dark:hover:bg-lime-800 dark:bg-lime-950 dark:border-lime-400 text-lime-700 fill-none shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100" stroke="currentColor">
 						<title>Share</title>
-						<g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 12C9 13.3807 7.88071 14.5 6.5 14.5C5.11929 14.5 4 13.3807 4 12C4 10.6193 5.11929 9.5 6.5 9.5C7.88071 9.5 9 10.6193 9 12Z" stroke="#15803d" stroke-width="1.5"></path> <path d="M14 6.5L9 10" stroke="#15803d" stroke-width="1.5" stroke-linecap="round"></path> <path d="M14 17.5L9 14" stroke="#15803d" stroke-width="1.5" stroke-linecap="round"></path> <path d="M19 18.5C19 19.8807 17.8807 21 16.5 21C15.1193 21 14 19.8807 14 18.5C14 17.1193 15.1193 16 16.5 16C17.8807 16 19 17.1193 19 18.5Z" stroke="#15803d" stroke-width="1.5"></path> <path d="M19 5.5C19 6.88071 17.8807 8 16.5 8C15.1193 8 14 6.88071 14 5.5C14 4.11929 15.1193 3 16.5 3C17.8807 3 19 4.11929 19 5.5Z" stroke="#15803d" stroke-width="1.5"></path> </g>
+						<g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 12C9 13.3807 7.88071 14.5 6.5 14.5C5.11929 14.5 4 13.3807 4 12C4 10.6193 5.11929 9.5 6.5 9.5C7.88071 9.5 9 10.6193 9 12Z" stroke-width="1.5"></path> <path d="M14 6.5L9 10" stroke-width="1.5" stroke-linecap="round"></path> <path d="M14 17.5L9 14" stroke-width="1.5" stroke-linecap="round"></path> <path d="M19 18.5C19 19.8807 17.8807 21 16.5 21C15.1193 21 14 19.8807 14 18.5C14 17.1193 15.1193 16 16.5 16C17.8807 16 19 17.1193 19 18.5Z" stroke-width="1.5"></path> <path d="M19 5.5C19 6.88071 17.8807 8 16.5 8C15.1193 8 14 6.88071 14 5.5C14 4.11929 15.1193 3 16.5 3C17.8807 3 19 4.11929 19 5.5Z" stroke-width="1.5"></path> </g>
 					</svg>
 				</button>
 			</div>
 			<button onclick="history.back()" class="my-auto hidden md:block" id="backBtn">
-				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class=" fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:fill-white dark:border-lime-400  fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
 					<title>Back</title>
 					<g id="SVGRepo_bgCarrier" stroke-width="0"/>
 					<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
@@ -71,19 +71,19 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 				</svg>
 			</button>
 			<div class="flex flex-row justify-center flex-wrap gap-3">
-				<h1 class="text-4xl md:text-5xl text-center my-auto text-stone-700 font-extrabold">{park.FullName}</h1>
+				<h1 class="dark:text-white text-4xl md:text-5xl text-center my-auto text-stone-700 font-extrabold">{park.FullName}</h1>
 				<span class="text-xl text-center self-end mb-0.5 text-stone-400 font-bold">{park.States}</span>
 			</div>
 			<button onclick="share();" class="my-auto hidden md:block">
-				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class=" fill-none shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:border-lime-400 dark:text-white text-lime-700 fill-none shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100" stroke="currentColor">
 					<title>Share</title>
-					<g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 12C9 13.3807 7.88071 14.5 6.5 14.5C5.11929 14.5 4 13.3807 4 12C4 10.6193 5.11929 9.5 6.5 9.5C7.88071 9.5 9 10.6193 9 12Z" stroke="#15803d" stroke-width="1.5"></path> <path d="M14 6.5L9 10" stroke="#15803d" stroke-width="1.5" stroke-linecap="round"></path> <path d="M14 17.5L9 14" stroke="#15803d" stroke-width="1.5" stroke-linecap="round"></path> <path d="M19 18.5C19 19.8807 17.8807 21 16.5 21C15.1193 21 14 19.8807 14 18.5C14 17.1193 15.1193 16 16.5 16C17.8807 16 19 17.1193 19 18.5Z" stroke="#15803d" stroke-width="1.5"></path> <path d="M19 5.5C19 6.88071 17.8807 8 16.5 8C15.1193 8 14 6.88071 14 5.5C14 4.11929 15.1193 3 16.5 3C17.8807 3 19 4.11929 19 5.5Z" stroke="#15803d" stroke-width="1.5"></path> </g>
+					<g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 12C9 13.3807 7.88071 14.5 6.5 14.5C5.11929 14.5 4 13.3807 4 12C4 10.6193 5.11929 9.5 6.5 9.5C7.88071 9.5 9 10.6193 9 12Z" stroke-width="1.5"></path> <path d="M14 6.5L9 10" stroke-width="1.5" stroke-linecap="round"></path> <path d="M14 17.5L9 14" stroke-width="1.5" stroke-linecap="round"></path> <path d="M19 18.5C19 19.8807 17.8807 21 16.5 21C15.1193 21 14 19.8807 14 18.5C14 17.1193 15.1193 16 16.5 16C17.8807 16 19 17.1193 19 18.5Z" stroke-width="1.5"></path> <path d="M19 5.5C19 6.88071 17.8807 8 16.5 8C15.1193 8 14 6.88071 14 5.5C14 4.11929 15.1193 3 16.5 3C17.8807 3 19 4.11929 19 5.5Z" stroke-width="1.5"></path> </g>
 				</svg>
 			</button>
 		</div>
 	</div>
 
-	<div id="description" class="sedan-sc-regular text-center text-stone-700 text-xl max-w-5xl mx-4 md:mx-auto mb-8">
+	<div id="description" class="dark:text-amber-50 sedan-sc-regular text-center text-stone-700 text-xl max-w-5xl mx-4 md:mx-auto mb-8">
 		{park.Description}
 	</div>
 
@@ -103,34 +103,34 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 			if len(park.Images) > 1 {
 				<div class="flex justify-center items-center mt-4 gap-1">
 					<button class="blaze-prev" aria-label="Go to previous slide">
-						<svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15 7L10 12L15 17" stroke="#365314" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+						<svg class="dark:text-lime-400 text-lime-800 w-7 h-7" stroke="currentColor" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15 7L10 12L15 17" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
 					</button>
-					<span id="indexEl" class="text-lg text-lime-800">1</span><span class="text-lg">/ { fmt.Sprintf("%v", len(park.Images)) }</span>
+					<span id="indexEl" class="dark:text-lime-400 text-lg text-lime-800">1</span><span class="dark:text-amber-50 text-lg">/ { fmt.Sprintf("%v", len(park.Images)) }</span>
 					<button class="blaze-next" aria-label="Go to next slide">
-						<svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10 7L15 12L10 17" stroke="#365314" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+						<svg class="dark:text-lime-400 text-lime-800 w-7 h-7" stroke="currentColor" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10 7L15 12L10 17" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
 					</button>
 				</div>
 			}
 		</div>
 	</div>
 
-	<div id="description" class="text-center text-stone-700 text-lg max-w-4xl mx-4 md:mx-auto mb-8">
+	<div id="description" class="dark:text-amber-50 text-center text-stone-700 text-lg max-w-4xl mx-4 md:mx-auto mb-8">
 		{park.WeatherInfo}
 	</div>
 
 	<!-- weather data: Date, TemperatureDayF, TemperatureNightF, WeatherIcon -->
-	<span class="text-stone-700 font-bold text-sm w-full block text-center mb-3">Weather @ { strings.TrimSuffix(park.FullName, " National Park") }</span>
+	<span class="dark:text-amber-100 text-stone-700 font-bold text-sm w-full block text-center mb-3">Weather @ { strings.TrimSuffix(park.FullName, " National Park") }</span>
 	<div class="w-full overflow-x-auto hide-scrollbar px-2 lg:px-0 mb-3">
 		<div id="weather-data" class="flex flex-row gap-2 justify-center items-center w-full pb-2 pl-16 md:pl-0">
 			for _, date := range park.Weather {
 				<div class="flex flex-col items-center min-w-16">
-					<span class="text-sm text-stone-700">{date.Date}</span>
+					<span class="dark:text-amber-50 text-sm text-stone-700">{date.Date}</span>
 					<img src={ date.WeatherIcon } alt="Weather icon" class="w-16 h-16" loading="lazy" />
 					<div class="flex flex-col items-center gap-1">
-						<span class="temperature text-xs text-stone-700 font-bold"
+						<span class="temperature dark:text-amber-50 text-xs text-stone-700 font-bold"
 							  temp-C={ date.TemperatureDayC + "°C" }
 							  temp-F={ date.TemperatureDayF + "°F" }></span>
-						<span class="temperature text-xs text-stone-700 font-bold"
+						<span class="temperature dark:text-amber-50 text-xs text-stone-700 font-bold"
 							  temp-C={ date.TemperatureNightC + "°C" }
 							  temp-F={ date.TemperatureNightF + "°F" }></span>
 					</div>
@@ -185,7 +185,7 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 		</a>
 	}
 	
-	<div id="description" class="text-center text-stone-700 text-lg max-w-4xl mx-4 md:mx-auto mb-8">
+	<div id="description" class="dark:text-amber-50 text-center text-stone-700 text-lg max-w-4xl mx-4 md:mx-auto mb-8">
 		{park.DirectionsInfo}
 	</div>
 	
