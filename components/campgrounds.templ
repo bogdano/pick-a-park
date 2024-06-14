@@ -114,27 +114,16 @@ templ CampgroundsInfo(park api.Park, campgrounds []api.Campground) {
 		function initMapboxMap() {
 			mapboxgl.accessToken = "pk.eyJ1IjoiYm9nenoiLCJhIjoiY2x2MDU0NjBoMWwzYjJqbWpnazlpaGkzbiJ9.DbPQ3cgc-RxyA5vlEW0mdQ"
 			mapDiv = document.getElementById('map')
+			const markers = JSON.parse(document.getElementById('map').dataset.markers)
+  				.filter(marker => marker.geometry.coordinates[0] !== '')
 			const map = new mapboxgl.Map({
 				container: 'map',
 				cooperativeGestures: true,
-				style: 'mapbox://styles/mapbox/outdoors-v12',
+				style: 'mapbox://styles/mapbox/outdoors-v12?optimize=true',
 			})
-			const markers = JSON.parse(document.getElementById('map').dataset.markers)
-  				.filter(marker => marker.geometry.coordinates[0] !== '')
 			let coords = []
 			markers.forEach(marker => {
 				coords.push(marker.geometry.coordinates)
-				if (marker.properties.firstcomefirstserve) {
-					new mapboxgl.Marker({ "color": "#65a30d" })
-						.setPopup(new mapboxgl.Popup({ closeButton: false, focusAfterOpen: false, maxWidth: 'none' }).setHTML(`<a href="${marker.properties.url}" class="font-bold underline text-lime-800">${marker.properties.title}</a>`))
-						.setLngLat(marker.geometry.coordinates)
-						.addTo(map)
-				} else {
-					new mapboxgl.Marker({ "color": "#e85151" })
-						.setPopup(new mapboxgl.Popup({ closeButton: false, focusAfterOpen: false, maxWidth: 'none' }).setHTML(`<a href="${marker.properties.url}" class="font-bold underline text-lime-800">${marker.properties.title}</a>`))
-						.setLngLat(marker.geometry.coordinates)
-						.addTo(map)
-				}
 			})
 			if (coords.length > 1) {
 				const bounds = new mapboxgl.LngLatBounds(coords[0], coords[0])
@@ -147,6 +136,19 @@ templ CampgroundsInfo(park api.Park, campgrounds []api.Campground) {
 			} else {
 				map.flyTo({ center: coords[0], zoom: 15 })
 			}
+			markers.forEach(marker => {
+				if (marker.properties.firstcomefirstserve) {
+					new mapboxgl.Marker({ "color": "#65a30d" })
+						.setPopup(new mapboxgl.Popup({ closeButton: false, focusAfterOpen: false, maxWidth: 'none' }).setHTML(`<a href="${marker.properties.url}" class="font-bold underline text-lime-800">${marker.properties.title}</a>`))
+						.setLngLat(marker.geometry.coordinates)
+						.addTo(map)
+				} else {
+					new mapboxgl.Marker({ "color": "#e85151" })
+						.setPopup(new mapboxgl.Popup({ closeButton: false, focusAfterOpen: false, maxWidth: 'none' }).setHTML(`<a href="${marker.properties.url}" class="font-bold underline text-lime-800">${marker.properties.title}</a>`))
+						.setLngLat(marker.geometry.coordinates)
+						.addTo(map)
+				}
+			})
 			// add zoom and rotation controls
 			map.addControl(new mapboxgl.NavigationControl())
 			// add fullscreen control

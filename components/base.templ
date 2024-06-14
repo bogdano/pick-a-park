@@ -8,14 +8,16 @@ templ Head(title string) {
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link rel="stylesheet" href="/tailwind.css" />
-		<script src="https://unpkg.com/htmx.org@1.9.12"></script>
-		<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
-		<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
-		<!-- this is the production build -->
-		<script src="https://unpkg.com/blaze-slider@latest/dist/blaze-slider.min.js"></script>
-		<!-- <script src="https://unpkg.com/blaze-slider@latest/dist/blaze-slider.dev.js"></script> -->
+		<meta name="msapplication-TileColor" content="#ffc40d" />
+		<meta name="theme-color" content="#4d7c0f" />
+		
+		<script src="/htmx.min.js"></script>
+		<script src="/mapbox-gl.js"></script>
+		<script src="/mapbox-gl-geocoder.min.js"></script>
+		<script defer src="/blaze-slider.min.js"></script>
+		// <script defer src="https://cloud.umami.is/script.js" data-website-id="66465c10-c517-4d2a-9475-e11db838b937"></script>
 
+		<link rel="stylesheet" href="/tailwind.css" />
 		<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" />
 		<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -27,10 +29,6 @@ templ Head(title string) {
 		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 		<link rel="manifest" href="/site.webmanifest" />
 		<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#4d7c0f" />
-		<meta name="msapplication-TileColor" content="#ffc40d" />
-		<meta name="theme-color" content="#4d7c0f" />
-		
-		<script defer src="https://cloud.umami.is/script.js" data-website-id="66465c10-c517-4d2a-9475-e11db838b937"></script>
 	</head>
 	<title>{ title }</title>
 }
@@ -80,7 +78,7 @@ templ Body(component templ.Component) {
 		<div class="loading-bar"></div>
 		@component
 	</body>
-	<script>
+	<script defer>
 		htmx.config.scrollBehavior = 'smooth';
 		// register service worker for offline support in PWA
 		if ('serviceWorker' in navigator) {
