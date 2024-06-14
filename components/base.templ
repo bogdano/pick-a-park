@@ -9,7 +9,7 @@ templ Head(title string) {
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" href="/tailwind.css" />
-		<script src="https://unpkg.com/htmx.org@2.0.0-beta1/dist/htmx.min.js"></script>
+		<script src="https://unpkg.com/htmx.org@1.9.12"></script>
 		<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
 		<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
 		<!-- this is the production build -->
@@ -47,7 +47,7 @@ templ Body(component templ.Component) {
 		</div>
 		<div id="settingsModal" class="dark:bg-stone-950 dark:bg-opacity-50 hidden fixed inset-0 z-50 bg-stone-500 bg-opacity-50 backdrop-filter backdrop-grayscale flex items-center justify-center p-4">
 			<div class="dark:bg-stone-800 dark:border dark:border-stone-400 bg-white rounded-2xl shadow-lg mx-auto">
-				<div onclick="toggleModal()" class="dark:border-stone-400 cursor-pointer dark:bg-stone-700 group bg-amber-50 rounded-t-2xl flex flex-row px-4 py-3 justify-between items-center border-b w-full align-middle">
+				<div onclick="toggleModal()" class="dark:border-stone-400 cursor-pointer dark:bg-stone-700 group bg-amber-100 rounded-t-2xl flex flex-row px-4 py-3 justify-between items-center border-b w-full align-middle">
 					<h2 class="dark:text-amber-100 text-stone-700 text-lg font-bold text-center">Settings</h2>
 					<button onclick="event.preventDefault(); event.stopPropagation(); toggleModal()" class="group-hover:bg-red-800 px-2 py-1 bg-red-500 hover:bg-red-700 rounded-full text-white text-sm">✕</button>
 				</div>

@@ -2,15 +2,16 @@ package components
 
 import (
     "go-htmx/api"
+	"fmt"
 )
 
-templ Campground(campground api.Campground, name string) {
+templ Campground(campground api.Campground, parkName string, Id string) {
     @DocType()
 	@Head(campground.Name)
-	@Body(CampgroundPage(campground, name))
+	@Body(CampgroundPage(campground, parkName, Id))
 }
 
-templ CampgroundPage(campground api.Campground, name string) {
+templ CampgroundPage(campground api.Campground, parkName string, Id string) {
     <div class="flex flex-col items-center justify-center pt-12 mb-8 gap-4">
 		<a href="/" hx-boost="false" class="block">
 			<img src="/logo.webp" alt="National Parks Finder logo" class="w-36 h-36" />
@@ -42,7 +43,7 @@ templ CampgroundPage(campground api.Campground, name string) {
 			</button>
 			<div class="flex flex-col justify-center flex-wrap">
 				<h1 class="dark:text-amber-100 text-4xl md:text-5xl text-center my-auto text-stone-700 font-extrabold">{ campground.Name }</h1>
-				<span class="text-2xl text-center mb-0.5 text-stone-400 font-bold">{ name }</span>
+				<span class="text-2xl text-center mb-0.5 text-stone-400 font-bold">{ parkName }</span>
 			</div>
 			<button onclick="share();" class="my-auto hidden md:block">
 				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:hover:bg-lime-900 dark:text-white text-lime-700 fill-none shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100" stroke="currentColor">
@@ -52,6 +53,91 @@ templ CampgroundPage(campground api.Campground, name string) {
 			</button>
 		</div>
 	</div>
+
+	if campground.MapImage != "" {
+		<div class="max-w-3xl mx-5 mb-4 md:mx-auto h-96 rounded-2xl bg-stone-200 relative overflow-hidden">
+			<img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/cnpa06hb04mppdu/%s/%s", Id, campground.MapImage)))} alt="campground map" class="w-full h-full rounded-2xl object-cover object-center" loading="lazy" />
+    		<a class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 rounded-2xl transition-opacity cursor-pointer flex justify-center items-center group">
+				<img src="/gmaps.svg" alt="Google Maps" class="opacity-0 group-hover:opacity-100 w-20 h-20" />
+			</a>
+		</div>
+	}
+	if campground.DirectionsOverview != "" {
+		<p class="dark:text-amber-50 max-w-2xl mx-5 md:mx-auto mb-8 text-sm text-center text-stone-500 font-bold">{ campground.DirectionsOverview }</p>
+	}
+
+	<p class="dark:text-amber-100 max-w-3xl mx-5 md:mx-auto mb-2 text-xl text-center text-stone-700 font-bold">DESCRIPTION</p>
+	<p class="dark:text-amber-50 max-w-3xl mx-5 md:mx-auto mb-8 text-base text-center text-stone-700">{ campground.Description }</p>
+
+	<div class="flex space-x-4 justify-center mb-8">
+		<div class="dark:bg-amber-700 dark:bg-opacity-80 dark:text-amber-100 bg-amber-100 text-amber-800 w-40 h-40 rounded-2xl flex flex-col justify-center items-center p-4">
+			<span class="font-bold text-center text-sm">RESERVABLE CAMP SPOTS:</span>
+			<div class="flex items-center mt-2">
+				<img src="/reservable.svg" alt="Reservable Icon" class="w-12 h-12 mr-2">
+				<span class=" text-2xl font-bold ">{ campground.Reservable }</span>
+			</div>
+		</div>
+		<div class="dark:bg-lime-900 dark:text-lime-100 bg-lime-100 text-lime-800 w-40 h-40 rounded-2xl flex flex-col justify-center items-center p-4">
+			<span class="font-bold text-center text-sm">FIRST COME FIRST SERVED:</span>
+			<div class="flex items-center mt-2">
+				<img src="/firstcomefirstserve.svg" alt="First-Come Icon" class="w-12 h-12 mr-2">
+				<span class="text-2xl font-bold">{ campground.FirstComeFirstServe }</span>
+			</div>
+		</div>
+	</div>
+
+	if campground.WeatherOverview != "" {
+		<p class="dark:text-amber-100 max-w-3xl mx-5 md:mx-auto mb-2 text-xl text-center text-stone-700 font-bold">WEATHER INFO</p>
+		<p class="dark:text-amber-50 max-w-3xl mx-5 md:mx-auto mb-8 text-base text-center text-stone-700">{ campground.WeatherOverview }</p>
+	}
+
+	if len(campground.Images) > 0 {
+		<div class="blaze-slider mb-8">
+			<div class="blaze-container max-w-3xl mx-auto">
+				<div class="blaze-track-container md:rounded-2xl max-w-fit">
+					<div class="blaze-track">
+						for _, image := range campground.Images {
+							<img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/cnpa06hb04mppdu/%s/%s", Id, image)))} 
+								alt="Park photo" 
+								class="park-photo w-auto object-cover block h-96"
+								loading="lazy" />
+						}
+					</div>
+				</div>
+				<!-- navigation buttons -->
+				if len(campground.Images) > 1 {
+					<div class="flex justify-center items-center mt-4 gap-1">
+						<button class="blaze-prev" aria-label="Go to previous slide">
+							<svg class="dark:text-lime-400 text-lime-800 w-7 h-7" stroke="currentColor" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15 7L10 12L15 17" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+						</button>
+						<span id="indexEl" class="dark:text-lime-400 text-lg text-lime-800">1</span><span class="dark:text-amber-50 text-lg">/ { fmt.Sprintf("%v", len(campground.Images)) }</span>
+						<button class="blaze-next" aria-label="Go to next slide">
+							<svg class="dark:text-lime-400 text-lime-800 w-7 h-7" stroke="currentColor" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10 7L15 12L10 17" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+						</button>
+					</div>
+				}
+			</div>
+		</div>
+	}
+
+	if campground.ReservationInfo != "" {
+		<p class="dark:text-amber-100 max-w-3xl mx-5 md:mx-auto mb-2 text-xl text-center text-stone-700 font-bold">RESERVATIONS INFO</p>
+		<p class="dark:text-amber-50 max-w-3xl mx-5 md:mx-auto mb-8 text-base text-center text-stone-700">{ campground.ReservationInfo }</p>
+		if campground.ReservationURL != "" {
+			<a  href={ templ.SafeURL(fmt.Sprint(campground.ReservationURL))} target="_blank" rel="noopener"
+				class="flex flex-row items-center justify-center w-64 mx-auto mb-24 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
+				<span class="mr-1">Reserve</span>
+				<svg class="h-5 w-5 text-white" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+					<g id="Interface / External_Link">
+					<path id="Vector" d="M10.0002 5H8.2002C7.08009 5 6.51962 5 6.0918 5.21799C5.71547 5.40973 5.40973 5.71547 5.21799 6.0918C5 6.51962 5 7.08009 5 8.2002V15.8002C5 16.9203 5 17.4801 5.21799 17.9079C5.40973 18.2842 5.71547 18.5905 6.0918 18.7822C6.5192 19 7.07899 19 8.19691 19H15.8031C16.921 19 17.48 19 17.9074 18.7822C18.2837 18.5905 18.5905 18.2839 18.7822 17.9076C19 17.4802 19 16.921 19 15.8031V14M20 9V4M20 4H15M20 4L13 11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+					</g>
+				</svg>
+			</a>
+		} else { 
+			<div class="mb-24"></div>
+		}
+	}
+
 
     <script>
 		// share button
@@ -77,5 +163,22 @@ templ CampgroundPage(campground api.Campground, name string) {
 				backBtn.style.display = 'none'
 			}
 		})
+
+		if (typeof BlazeSlider === 'undefined') {
+			throw new Error('BlazeSlider is not loaded')
+		} else {
+			const config = {
+				all: {
+					loop: true,
+					slideGap: '5px',
+				},
+			}
+			const el = document.querySelector('.blaze-slider')
+			const slider = new BlazeSlider(el, config)
+			const indexEl = document.getElementById('indexEl')
+			slider.onSlide((pageIndex, firstVisibleSlideIndex, lastVisibleSlideIndex) => {
+				indexEl.textContent = pageIndex + 1
+			})
+		}
     </script>
 }

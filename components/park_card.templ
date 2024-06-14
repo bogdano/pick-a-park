@@ -7,7 +7,7 @@ import (
  
 templ ParkCard(park api.Park, placeName string, stateName string) {
     <a  href={ templ.SafeURL(fmt.Sprintf("/park/%s?q=%s,%s", park.ParkCode, placeName, stateName)) } 
-        class="park-card dark:bg-lime-900 dark:text-white block group rounded-xl shadow-md w-44 md:w-64 transition-all duration-300 ease-in-out hover:text-white hover:bg-lime-700">
+        class="park-card dark:bg-lime-900 dark:text-white bg-amber-50 block group rounded-xl shadow-md w-44 md:w-64 transition-all duration-300 ease-in-out hover:text-white hover:bg-lime-700">
         <div class="flex flex-col">
             <div class="rounded-t-xl h-44 md:h-64 w-full bg-stone-200 overflow-hidden">
                 <img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/eop7kcada8abcp4/%s/%s?thumb=500x500", park.ParkRecordId, park.Images[0])))} 

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
+	"image/png"
 	"io"
 	"log"
 	"net/http"
@@ -67,6 +68,7 @@ type Campground struct {
 	WeatherOverview     string   `json:"weatherOverview"`
 	Reservable          string   `json:"numberOfSitesReservable"`
 	FirstComeFirstServe string   `json:"numberOfSitesFirstComeFirstServe"`
+	MapImage            string   `json:"-"`
 }
 
 type WeatherDate struct {
@@ -288,13 +290,57 @@ func fetchCampgrounds(app *pocketbase.PocketBase, parkId string, parkCode string
 				continue
 			}
 		}
-		// save the campground record to the national park record
-		if err := form.Submit(); err != nil {
-			log.Printf("Error saving record with image: %v", err)
-			continue
+
+		if record.GetString("mapImage") == "" {
+			// get map image from mapbox
+			imageBytes, err := getMapImage(campground.Latitude, campground.Longitude)
+			if err != nil {
+				log.Printf("Error getting map image: %v", err)
+				continue
+			}
+			tmpfile, err := filesystem.NewFileFromBytes(imageBytes, "map.png")
+			if err != nil {
+				log.Printf("Error saving map image to a temporary file: %v", err)
+				continue
+			}
+			form.AddFiles("mapImage", tmpfile)
+			// save the campground record to the national park record
+			if err := form.Submit(); err != nil {
+				log.Printf("Error saving record with image: %v", err)
+				continue
+			}
+			imageBytes, tmpfile = nil, nil // free up memory
+		} else {
+			log.Printf("Campground map image already exists")
 		}
 	}
 	return len(data.Data), err
+}
+
+func getMapImage(lat, lon string) ([]byte, error) {
+	mapboxAPIKey := os.Getenv("MAPBOX_ACCESS_TOKEN")
+	// get map image for the campground
+	mapImageURL := fmt.Sprintf("https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/static/pin-l+e85151(%s,%s)/%s,%s,15.2,0/768x384@2x?access_token=%s", lon, lat, lon, lat, mapboxAPIKey)
+	resp, err := http.Get(mapImageURL)
+	if err != nil {
+		log.Printf("Error fetching map image: %v", err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+	mapImageBytes, _, err := image.Decode(resp.Body)
+	if err != nil {
+		log.Printf("Error reading map image: %v", err)
+		return nil, err
+	}
+	// save the map image to a temporary file
+	byteImage := new(bytes.Buffer)
+	err = png.Encode(byteImage, mapImageBytes)
+	if err != nil {
+		log.Printf("Error encoding map image to a byte slice: %v", err)
+		return nil, err
+	}
+	log.Printf("Saving map image")
+	return byteImage.Bytes(), nil
 }
 
 // downloadAndResizeImage downloads an image from the given URL and resizes it if it's larger than a maximum width.

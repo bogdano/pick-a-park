@@ -4,6 +4,7 @@ import (
     "go-htmx/api"
     "fmt"
     "strings"
+	"encoding/json"
 )
 
 templ Campgrounds(park api.Park, campgrounds []api.Campground) {
@@ -14,21 +15,25 @@ templ Campgrounds(park api.Park, campgrounds []api.Campground) {
 
 // get JSON for mapbox from campgrounds
 func campToJSON(campgrounds []api.Campground) string {
-	var json string
-	for _, campground := range campgrounds {
-		json += fmt.Sprintf(`{
-			"type": "Feature",
-			"geometry": {
-				"type": "Point",
-				"coordinates": [%s, %s]
-			},
-			"properties": {
-				"title": "%s",
-				"icon": "campsite"
-			}
-		},`, campground.Longitude, campground.Latitude, campground.Name)
-	}
-	return json
+    features := []string{}
+    for _, campground := range campgrounds {
+        // map that corresponds to JSON structure
+        feature := map[string]interface{}{
+            "type": "Feature",
+            "geometry": map[string]interface{}{
+                "type": "Point",
+                "coordinates": []string{campground.Longitude, campground.Latitude},
+            },
+            "properties": map[string]interface{}{
+                "title": campground.Name,
+				"url": fmt.Sprintf("/campground/%s", campground.Id),
+				"firstcomefirstserve": campground.FirstComeFirstServe != "0",
+            },
+        }
+        featureJSON, _ := json.Marshal(feature)
+        features = append(features, string(featureJSON))
+    }
+    return "[" + strings.Join(features, ",") + "]"
 }
 
 templ CampgroundsInfo(park api.Park, campgrounds []api.Campground) {
@@ -74,10 +79,14 @@ templ CampgroundsInfo(park api.Park, campgrounds []api.Campground) {
 		</div>
 	</div>
 
-    <div class="flex flex-col items-center gap-4 mb-8">
+	<!-- mapbox map with all campgrounds -->
+	<div class="max-w-3xl mx-5 mb-8 md:mx-auto h-96 rounded-2xl" id="map" data-markers={ campToJSON(campgrounds) } data-lat={ park.Latitude } data-lon={ park.Longitude }></div>
+
+    <div class="flex flex-col items-center gap-4 mb-24">
         <div class="max-w-3xl mx-auto">
             for _, campground := range campgrounds {
                 <a href={ templ.SafeURL(fmt.Sprintf("/campground/%s", campground.Id)) } id={ fmt.Sprintf("camp-%s", campground.Id) } 
+				   hx-boost="false"
 				   class={ "dark:bg-opacity-10 dark:bg-amber-500 dark:border-amber-600 dark:hover:bg-opacity-20 hover:bg-amber-200 border border-amber-300 mx-5 flex justify-between items-center p-4 rounded-2xl mb-4 cursor-pointer group bg-amber-100", templ.KV("dark:bg-green-500 dark:border-green-500 border-green-300 hover:bg-green-200 bg-green-100", campground.FirstComeFirstServe != "0") }>
                     <div class="flex flex-col">
 						<p class="dark:text-amber-50 text-stone-700 font-bold text-xl">{ strings.ToUpper(campground.Name) }</p>
@@ -98,39 +107,74 @@ templ CampgroundsInfo(park api.Park, campgrounds []api.Campground) {
         </div>
     </div>
 
-    <a  href={ templ.SafeURL(fmt.Sprintf("https://www.nps.gov/%s/planyourvisit/", park.ParkCode))} target="_blank" rel="noopener"
-        class="flex flex-row items-center justify-center w-64 mx-auto mb-24 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
-        <span class="mr-1">More Info</span>
-		<svg class="h-5 w-5 text-white" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-			<g id="Interface / External_Link">
-			<path id="Vector" d="M10.0002 5H8.2002C7.08009 5 6.51962 5 6.0918 5.21799C5.71547 5.40973 5.40973 5.71547 5.21799 6.0918C5 6.51962 5 7.08009 5 8.2002V15.8002C5 16.9203 5 17.4801 5.21799 17.9079C5.40973 18.2842 5.71547 18.5905 6.0918 18.7822C6.5192 19 7.07899 19 8.19691 19H15.8031C16.921 19 17.48 19 17.9074 18.7822C18.2837 18.5905 18.5905 18.2839 18.7822 17.9076C19 17.4802 19 16.921 19 15.8031V14M20 9V4M20 4H15M20 4L13 11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-			</g>
-		</svg>
-    </a>
-
     <script>
-    // share button
-	function share() {
-		if (navigator.share) {
-			navigator.share({
-				title: document.querySelector('h1').textContent,
-				text: "Let's go on a roadtrip!",
-				url: window.location.href,
+		// mapbox
+		htmx.onLoad(initMapboxMap())
+		initMapboxMap()
+		function initMapboxMap() {
+			mapboxgl.accessToken = "pk.eyJ1IjoiYm9nenoiLCJhIjoiY2x2MDU0NjBoMWwzYjJqbWpnazlpaGkzbiJ9.DbPQ3cgc-RxyA5vlEW0mdQ"
+			mapDiv = document.getElementById('map')
+			const map = new mapboxgl.Map({
+				container: 'map',
+				cooperativeGestures: true,
+				style: 'mapbox://styles/mapbox/outdoors-v12',
 			})
-		} else {
-			// copy url to clipboard
-			navigator.clipboard.writeText(window.location.href)
-			alert('Link copied to clipboard.')
+			const markers = JSON.parse(document.getElementById('map').dataset.markers)
+  				.filter(marker => marker.geometry.coordinates[0] !== '')
+			let coords = []
+			markers.forEach(marker => {
+				coords.push(marker.geometry.coordinates)
+				if (marker.properties.firstcomefirstserve) {
+					new mapboxgl.Marker({ "color": "#65a30d" })
+						.setPopup(new mapboxgl.Popup({ closeButton: false, focusAfterOpen: false, maxWidth: 'none' }).setHTML(`<a href="${marker.properties.url}" class="font-bold underline text-lime-800">${marker.properties.title}</a>`))
+						.setLngLat(marker.geometry.coordinates)
+						.addTo(map)
+				} else {
+					new mapboxgl.Marker({ "color": "#e85151" })
+						.setPopup(new mapboxgl.Popup({ closeButton: false, focusAfterOpen: false, maxWidth: 'none' }).setHTML(`<a href="${marker.properties.url}" class="font-bold underline text-lime-800">${marker.properties.title}</a>`))
+						.setLngLat(marker.geometry.coordinates)
+						.addTo(map)
+				}
+			})
+			if (coords.length > 1) {
+				const bounds = new mapboxgl.LngLatBounds(coords[0], coords[0])
+				coords.forEach(coord => {
+					bounds.extend(coord)
+				})
+				map.fitBounds(bounds, {
+					padding: 50
+				})
+			} else {
+				map.flyTo({ center: coords[0], zoom: 15 })
+			}
+			// add zoom and rotation controls
+			map.addControl(new mapboxgl.NavigationControl())
+			// add fullscreen control
+			map.addControl(new mapboxgl.FullscreenControl())
 		}
-	}
+		
+		// share button
+		function share() {
+			if (navigator.share) {
+				navigator.share({
+					title: document.querySelector('h1').textContent,
+					text: "Let's go on a roadtrip!",
+					url: window.location.href,
+				})
+			} else {
+				// copy url to clipboard
+				navigator.clipboard.writeText(window.location.href)
+				alert('Link copied to clipboard.')
+			}
+		}
 
-    // domcontentloaded listener to hide back button if there is no history (if park opened in new tab)
-	document.addEventListener('DOMContentLoaded', () => {
-		const backBtn = document.getElementById('backBtn')
-        if (!backBtn) return
-		if (window.history.length === 1) {
-			backBtn.style.display = 'none'
-		}
-	})
+		// domcontentloaded listener to hide back button if there is no history (if park opened in new tab)
+		document.addEventListener('DOMContentLoaded', () => {
+			const backBtn = document.getElementById('backBtn')
+			if (!backBtn) return
+			if (window.history.length === 1) {
+				backBtn.style.display = 'none'
+			}
+		})
     </script>
 }
