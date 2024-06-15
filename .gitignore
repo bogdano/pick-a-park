@@ -5,3 +5,4 @@ main
 .env
 build-errors.log
 go-htmx
+/node_modules
