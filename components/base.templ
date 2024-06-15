@@ -10,12 +10,7 @@ templ Head(title string) {
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="msapplication-TileColor" content="#ffc40d" />
 		<meta name="theme-color" content="#4d7c0f" />
-		
-		<script src="/htmx.min.js"></script>
-		<script src="/mapbox-gl.js"></script>
-		<script src="/mapbox-gl-geocoder.min.js"></script>
-		<script defer src="/blaze-slider.min.js"></script>
-		// <script defer src="https://cloud.umami.is/script.js" data-website-id="66465c10-c517-4d2a-9475-e11db838b937"></script>
+		<meta name="description" content="Pick a US National Park for your next roadtrip!" />
 
 		<link rel="stylesheet" href="/tailwind.css" />
 		<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" />
@@ -27,8 +22,14 @@ templ Head(title string) {
 		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
 		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-		<link rel="manifest" href="/site.webmanifest" />
+		<link rel="manifest" crossorigin="use-credentials" href="/manifest.json" />
 		<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#4d7c0f" />
+
+		<script src="/htmx.min.js"></script>
+		<script src="/mapbox-gl.js"></script>
+		<script src="/mapbox-gl-geocoder.min.js"></script>
+		<script src="/blaze-slider.min.js"></script>
+		// <script defer src="https://cloud.umami.is/script.js" data-website-id="66465c10-c517-4d2a-9475-e11db838b937"></script>
 	</head>
 	<title>{ title }</title>
 }
@@ -62,14 +63,14 @@ templ Body(component templ.Component) {
 							<path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 11.4477 2.44772 11 3 11H5C5.55228 11 6 11.4477 6 12C6 12.5523 5.55228 13 5 13H3C2.44772 13 2 12.5523 2 12Z" />
 							<path fill-rule="evenodd" clip-rule="evenodd" d="M4.29289 4.29289C4.68342 3.90237 5.31658 3.90237 5.70711 4.29289L7.70711 6.29289C8.09763 6.68342 8.09763 7.31658 7.70711 7.70711C7.31658 8.09763 6.68342 8.09763 6.29289 7.70711L4.29289 5.70711C3.90237 5.31658 3.90237 4.68342 4.29289 4.29289Z" />
 						</svg>
-						<input type="checkbox" id="darkModeToggle" class="" />
+						<input type="checkbox" id="darkModeToggle" />
 						<svg xmlns="http://www.w3.org/2000/svg" class="dark:fill-amber-50 fill-stone-700 w-6 h-6" viewBox="0 0 24 24">
 							<path d="M12 22C17.5228 22 22 17.5228 22 12C22 11.5373 21.3065 11.4608 21.0672 11.8568C19.9289 13.7406 17.8615 15 15.5 15C11.9101 15 9 12.0899 9 8.5C9 6.13845 10.2594 4.07105 12.1432 2.93276C12.5392 2.69347 12.4627 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" />
 						</svg>
 					</label>
 					<label class="flex px-8 space-x-3 justify-center cursor-pointer">
 						<span class="dark:text-amber-50 font-mono text-gray-700">km | °C</span>
-						<input type="checkbox" id="unitToggle" class="" />
+						<input type="checkbox" id="unitToggle" />
 						<span class="dark:text-amber-50 font-mono text-gray-700">mi | °F</span>
 					</label>
 				</div>

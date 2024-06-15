@@ -35,7 +35,7 @@
       @apply disabled:after:bg-opacity-75 disabled:cursor-not-allowed;
       @apply disabled:checked:before:bg-opacity-40;
     }
-  }
+}
 
 @keyframes fade-in {
     from { opacity: 0; }
@@ -121,6 +121,10 @@
 .blaze-slider.end .blaze-next {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.mapboxgl-scroll-zoom-blocker, .mapboxgl-touch-pan-blocker {
+    transition-delay: 0s !important;
 }
   
 .sedan-sc-regular {

@@ -83,7 +83,7 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 		</div>
 	</div>
 
-	<div id="description" class="dark:text-amber-50 sedan-sc-regular text-center text-stone-700 text-xl max-w-5xl mx-4 md:mx-auto mb-8">
+	<div id="description" class="dark:text-amber-50 sedan-sc-regular text-center text-stone-700 text-xl max-w-5xl mx-4 md:mx-auto mb-8 break-words">
 		{park.Description}
 	</div>
 
@@ -114,7 +114,7 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 		</div>
 	</div>
 
-	<div id="description" class="dark:text-amber-50 text-center text-stone-700 text-lg max-w-4xl mx-4 md:mx-auto mb-8">
+	<div id="description" class="dark:text-amber-50 text-center text-stone-700 text-lg max-w-4xl mx-4 md:mx-auto mb-8 break-words">
 		{park.WeatherInfo}
 	</div>
 
@@ -185,7 +185,7 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 		</a>
 	}
 	
-	<div id="description" class="dark:text-amber-50 text-center text-stone-700 text-lg max-w-4xl mx-4 md:mx-auto mb-8">
+	<div class="dark:text-amber-50 text-center text-stone-700 text-lg max-w-4xl mx-4 md:mx-auto mb-8 break-words">
 		{park.DirectionsInfo}
 	</div>
 	
@@ -201,7 +201,7 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 								templ.KV("dark:bg-fuchsia-900 dark:text-fuchsia-100 bg-fuchsia-100 text-fuchsia-800", alert.Category != "Information" && alert.Category != "Caution" && alert.Category != "Danger" && alert.Category != "Park Closure")}>
 						<p class="text-lg">{strings.ToUpper(alert.Category)}</p>
 						<p class="font-bold text-base">{alert.Title}</p>
-						<p class="text-sm mb-4">{alert.Description}</p>
+						<p class="text-sm mb-4 break-words">{alert.Description}</p>
 						if alert.Url != "" {
 							<a href={ templ.SafeURL(fmt.Sprintf(alert.Url)) } class="font-bold text-sm absolute right-4 bottom-4 group-hover:underline">more</a>
 						}
