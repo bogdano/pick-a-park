@@ -8,9 +8,7 @@ import (
 )
 
 templ Campgrounds(park api.Park, campgrounds []api.Campground) {
-	@DocType()
-	@Head(park.FullName + " | Campsites")
-	@Body(CampgroundsInfo(park, campgrounds))
+	@Page(park.FullName + " | Campsites", campgroundsInfo(park, campgrounds))
 }
 
 // get JSON for mapbox from campgrounds
@@ -36,7 +34,7 @@ func campToJSON(campgrounds []api.Campground) string {
     return "[" + strings.Join(features, ",") + "]"
 }
 
-templ CampgroundsInfo(park api.Park, campgrounds []api.Campground) {
+templ campgroundsInfo(park api.Park, campgrounds []api.Campground) {
 	<div class="flex flex-col items-center justify-center pt-12 mb-8 gap-4">
 		<a href="/" hx-boost="false" class="block">
 			<img src="/logo.webp" alt="National Parks Finder logo" class="w-36 h-36" />
@@ -68,7 +66,7 @@ templ CampgroundsInfo(park api.Park, campgrounds []api.Campground) {
 			</button>
 			<div class="flex flex-row justify-center flex-wrap gap-3">
 				<h1 class="dark:text-amber-100 text-4xl md:text-5xl text-center my-auto text-stone-700 font-extrabold">{ trimParkName(park.FullName) + " Campsites"}</h1>
-				<span class="text-xl text-center self-end mb-0.5 text-stone-400 font-bold">{park.States}</span>
+				<span class="text-xl text-center self-end mb-0.5 text-stone-500 font-bold">{park.States}</span>
 			</div>
 			<button onclick="share();" class="my-auto hidden md:block">
 				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:hover:bg-lime-900 dark:text-white text-lime-700 fill-none shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100" stroke="currentColor">
@@ -89,12 +87,12 @@ templ CampgroundsInfo(park api.Park, campgrounds []api.Campground) {
 				   hx-boost="false"
 				   class={ "dark:bg-opacity-10 dark:bg-amber-500 dark:border-amber-600 dark:hover:bg-opacity-20 hover:bg-amber-200 border border-amber-300 mx-5 flex justify-between items-center p-4 rounded-2xl mb-4 cursor-pointer group bg-amber-100", templ.KV("dark:bg-green-500 dark:border-green-500 border-green-300 hover:bg-green-200 bg-green-100", campground.FirstComeFirstServe != "0") }>
                     <div class="flex flex-col">
-						<p class="dark:text-amber-50 text-stone-700 font-bold text-xl">{ strings.ToUpper(campground.Name) }</p>
+						<p class={ "dark:text-amber-50 text-amber-700 font-bold text-xl", templ.KV("text-green-700", campground.FirstComeFirstServe != "0") }>{ strings.ToUpper(campground.Name) }</p>
 						<p class="dark:text-amber-50 text-sm mb-2">{ campground.Description }...</p>
 						if campground.FirstComeFirstServe != "0" {
-							<p class="text-lime-600 font-bold text-xs">has first-come-first-serve spots</p>
+							<p class="dark:text-lime-500 text-lime-700 font-bold text-xs">has first-come-first-serve spots</p>
 						} else {
-							<p class="text-amber-600 font-bold text-xs">reservations required</p>
+							<p class="dark:text-amber-500 text-amber-700 font-bold text-xs">reservations required</p>
 						}
 					</div>
 					<svg class="w-12 h-12 md:h-7 md:w-7 dark:text-amber-100" stroke="currentColor" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -108,53 +106,66 @@ templ CampgroundsInfo(park api.Park, campgrounds []api.Campground) {
     </div>
 
     <script>
-		// mapbox
-		htmx.onLoad(initMapboxMap())
-		initMapboxMap()
+		function loadMapboxScripts(callback) {
+			if (typeof mapboxgl === 'undefined') {
+				const script = document.createElement('script');
+				const style = document.createElement('link');
+				script.src = '/mapbox-gl.js';
+				style.rel = 'stylesheet';
+				style.href = '/mapbox-gl.css';
+				document.head.appendChild(style);
+				document.head.appendChild(script);
+				script.onload = callback;
+				script.onerror = () => {
+					console.error('Failed to load Mapbox GL JS');
+				};
+			} else {
+				callback();
+			}
+		}
+
 		function initMapboxMap() {
-			mapboxgl.accessToken = "pk.eyJ1IjoiYm9nenoiLCJhIjoiY2x2MDU0NjBoMWwzYjJqbWpnazlpaGkzbiJ9.DbPQ3cgc-RxyA5vlEW0mdQ"
-			mapDiv = document.getElementById('map')
-			const markers = JSON.parse(document.getElementById('map').dataset.markers)
-  				.filter(marker => marker.geometry.coordinates[0] !== '')
+			mapboxgl.accessToken = "pk.eyJ1IjoiYm9nenoiLCJhIjoiY2x2MDU0NjBoMWwzYjJqbWpnazlpaGkzbiJ9.DbPQ3cgc-RxyA5vlEW0mdQ";
+			const mapDiv = document.getElementById('map');
+			const markers = JSON.parse(mapDiv.dataset.markers).filter(marker => marker.geometry.coordinates[0] !== '');
 			const map = new mapboxgl.Map({
 				container: 'map',
 				cooperativeGestures: true,
 				style: 'mapbox://styles/mapbox/outdoors-v12?optimize=true',
-			})
-			let coords = []
-			markers.forEach(marker => {
-				coords.push(marker.geometry.coordinates)
-			})
-			if (coords.length > 1) {
-				const bounds = new mapboxgl.LngLatBounds(coords[0], coords[0])
-				coords.forEach(coord => {
-					bounds.extend(coord)
-				})
-				map.fitBounds(bounds, {
-					padding: 50
-				})
-			} else {
-				map.flyTo({ center: coords[0], zoom: 15 })
-			}
-			markers.forEach(marker => {
-				if (marker.properties.firstcomefirstserve) {
-					new mapboxgl.Marker({ "color": "#65a30d" })
-						.setPopup(new mapboxgl.Popup({ closeButton: false, focusAfterOpen: false, maxWidth: 'none' }).setHTML(`<a href="${marker.properties.url}" class="font-bold underline text-lime-800">${marker.properties.title}</a>`))
-						.setLngLat(marker.geometry.coordinates)
-						.addTo(map)
-				} else {
-					new mapboxgl.Marker({ "color": "#e85151" })
-						.setPopup(new mapboxgl.Popup({ closeButton: false, focusAfterOpen: false, maxWidth: 'none' }).setHTML(`<a href="${marker.properties.url}" class="font-bold underline text-lime-800">${marker.properties.title}</a>`))
-						.setLngLat(marker.geometry.coordinates)
-						.addTo(map)
-				}
-			})
-			// add zoom and rotation controls
-			map.addControl(new mapboxgl.NavigationControl())
-			// add fullscreen control
-			map.addControl(new mapboxgl.FullscreenControl())
+			});
+
+			processMarkers(markers, map);
+
+			map.addControl(new mapboxgl.NavigationControl());
+			map.addControl(new mapboxgl.FullscreenControl());
 		}
-		
+
+		function processMarkers(markers, map) {
+			let coords = markers.map(marker => marker.geometry.coordinates);
+			adjustMapView(coords, map);
+			markers.forEach(marker => addMarker(marker, map));
+		}
+
+		function adjustMapView(coords, map) {
+			if (coords.length > 1) {
+				const bounds = coords.reduce((bounds, coord) => bounds.extend(coord), new mapboxgl.LngLatBounds(coords[0], coords[0]));
+				map.fitBounds(bounds, { padding: 50 });
+			} else if (coords.length === 1) {
+				map.flyTo({ center: coords[0], zoom: 15 });
+			}
+		}
+
+		function addMarker(marker, map) {
+			const color = marker.properties.firstcomefirstserve ? "#65a30d" : "#e85151";
+			new mapboxgl.Marker({ color: color })
+				.setPopup(new mapboxgl.Popup({ closeButton: false, focusAfterOpen: false, maxWidth: 'none' })
+					.setHTML(`<a href="${marker.properties.url}" class="font-bold underline text-lime-800">${marker.properties.title}</a>`))
+				.setLngLat(marker.geometry.coordinates)
+				.addTo(map);
+		}
+
+		loadMapboxScripts(initMapboxMap);
+				
 		// share button
 		function share() {
 			if (navigator.share) {

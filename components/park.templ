@@ -8,9 +8,7 @@ import (
 )
 
 templ Park(park api.Park, placeName string, alerts []api.Alert) {
-	@DocType()
-	@Head(park.FullName)
-	@Body(ParkInfo(park, placeName, alerts))
+	@Page(park.FullName, parkInfo(park, placeName, alerts))
 }
 
 func trimParkName(fullName string) string {
@@ -40,7 +38,7 @@ script redirect(parkCode string) {
 	redirect(parkCode)
 }
 
-templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
+templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 	<div class="flex flex-col items-center justify-center pt-12 mb-8 gap-4">
 		<a href="/" hx-boost="false" class="block">
 			<img src="/logo.webp" alt="National Parks Finder logo" class="w-36 h-36" />
@@ -72,7 +70,7 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 			</button>
 			<div class="flex flex-row justify-center flex-wrap gap-3">
 				<h1 class="dark:text-amber-100 text-4xl md:text-5xl text-center my-auto text-stone-700 font-extrabold">{park.FullName}</h1>
-				<span class="text-xl text-center self-end mb-0.5 text-stone-400 font-bold">{park.States}</span>
+				<span class="text-xl text-center self-end mb-0.5 text-stone-500 font-bold">{park.States}</span>
 			</div>
 			<button onclick="share();" class="my-auto hidden md:block">
 				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:hover:bg-lime-900 dark:text-white text-lime-700 fill-none shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100" stroke="currentColor">
@@ -91,11 +89,14 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 		<div class="blaze-container max-w-3xl mx-auto">
 			<div class="blaze-track-container md:rounded-2xl max-w-fit">
 				<div class="blaze-track">
-					for _, image := range park.Images {
+					for i, image := range park.Images {
 						<img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/eop7kcada8abcp4/%s/%s", park.ParkRecordId, image)))} 
 							alt="Park photo" 
 							class="park-photo w-auto object-cover block h-96"
-							loading="lazy" />
+							if i > 0 {
+								loading="lazy"
+							}
+							/>
 					}
 				</div>
 			</div>
@@ -119,7 +120,7 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 	</div>
 
 	<!-- weather data: Date, TemperatureDayF, TemperatureNightF, WeatherIcon -->
-	<span class="dark:text-amber-100 text-stone-700 font-bold text-sm w-full block text-center mb-3">Weather @ { strings.TrimSuffix(park.FullName, " National Park") }</span>
+	<span class="dark:text-amber-100 text-stone-700 font-bold text-sm w-full block text-center mb-3">Weather @ { trimParkName(park.FullName) }</span>
 	<div class="w-full overflow-x-auto hide-scrollbar px-2 lg:px-0 mb-3">
 		<div id="weather-data" class="flex flex-row gap-2 justify-center items-center w-full pb-2 pl-16 md:pl-0">
 			for _, date := range park.Weather {
@@ -138,7 +139,7 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 			}
 		</div>
 	</div>
-	<span class="text-stone-400 text-xs text-center w-full block font-bold mb-8">last updated: { lastUpdated(park.Weather[0].LastUpdated) }</span>
+	<span class="text-stone-500 text-xs text-center w-full block font-bold mb-8">last updated: { lastUpdated(park.Weather[0].LastUpdated) }</span>
 
 	if placeName != "" {
 		<div id="directions" class="group bg-lime-700 text-white font-mono font-extrabold text-sm max-w-3xl mx-auto md:rounded-2xl px-8 py-6 mb-4 relative">
@@ -171,7 +172,7 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 					<span>{ trimParkName(park.FullName) }</span>
 				</div>
 			</div>
-			<button onclick={ redirect(park.ParkCode) } class="opacity-0 group-hover:opacity-100 absolute right-2 top-2 p-1 rounded-full bg-red-700 hover:bg-red-900">
+			<button onclick={ redirect(park.ParkCode) } aria-label="Hide start location" class="opacity-0 group-hover:opacity-100 absolute right-2 top-2 p-1 rounded-full bg-red-700 hover:bg-red-900">
 				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-4 h-4 fill-current stroke-current">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
 				</svg>
@@ -229,30 +230,51 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 		// change url without reload
 		history.pushState({}, '', `/park/${parkCode}`)
 	}
-	// domcontentloaded listener to hide back button if there is no history (if park opened in new tab)
-	document.addEventListener('DOMContentLoaded', () => {
+
+	(function() {
 		const backBtn = document.getElementById('backBtn')
 		if (!backBtn) return
 		if (window.history.length === 1) {
 			backBtn.style.display = 'none'
 		}
-	})
-	if (typeof BlazeSlider === 'undefined') {
-		throw new Error('BlazeSlider is not loaded')
-	} else {
-		const config = {
-			all: {
-				loop: true,
-				slideGap: '5px',
-			},
+
+		function loadScript(src, callback) {
+			const script = document.createElement('script');
+			script.src = src;
+			script.onload = callback;
+			script.onerror = function() {
+				console.error('Failed to load script:', src);
+			};
+			document.head.appendChild(script);
 		}
-		const el = document.querySelector('.blaze-slider')
-		const slider = new BlazeSlider(el, config)
-		const indexEl = document.getElementById('indexEl')
-		slider.onSlide((pageIndex, firstVisibleSlideIndex, lastVisibleSlideIndex) => {
-			indexEl.textContent = pageIndex + 1
-		})
-	}
+
+		function initSlider() {
+			const el = document.querySelector('.blaze-slider');
+			if (!el) {
+				console.error('BlazeSlider element not found');
+				return;
+			}
+			const config = {
+				all: {
+					loop: true,
+					slideGap: '5px',
+				},
+			};
+			const slider = new BlazeSlider(el, config);
+			const indexEl = document.getElementById('indexEl');
+			if (indexEl) {
+				slider.onSlide((pageIndex, firstVisibleSlideIndex, lastVisibleSlideIndex) => {
+					indexEl.textContent = pageIndex + 1;
+				});
+			}
+		}
+		if (typeof BlazeSlider === 'undefined') {
+			loadScript('/blaze-slider.min.js', initSlider);
+		} else {
+			initSlider();
+		}
+	})();
+
 	// share button
 	function share() {
 		if (navigator.share) {

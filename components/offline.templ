@@ -1,12 +1,10 @@
 package components
 
 templ Offline() {
-	@DocType()
-	@Head("Offline")
-	@Body(Content())
+	@Page("Offline", content())
 }
 
-templ Content() {
+templ content() {
     <div class="h-screen flex justify-center items-center">
         <div class="flex flex-col items-center">
             <a href="/" hx-boost="false" class="block">

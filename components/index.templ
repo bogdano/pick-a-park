@@ -6,9 +6,7 @@ import (
 )
 
 templ Index(parks []api.Park, placeName string, state string) {
-	@DocType()
-	@Head("Pick A Park!")
-	@Body(pageIndex(parks, placeName, state))
+	@Page("Pick A Park!", pageIndex(parks, placeName, state))
 }
 
 templ pageIndex(parks []api.Park, placeName string, state string) {
@@ -19,7 +17,7 @@ templ pageIndex(parks []api.Park, placeName string, state string) {
 				<h1 class="dark:text-amber-100 text-4xl md:text-5xl font-extrabold text-stone-700">Pick A Park</h1>
 			</div>
 		</a>
-		<div id="geocoder" class="geocoder"></div>
+		<div id="geocoder" class="geocoder rounded bg-stone-100"></div>
 	</div>
 
 	<div id="parks-container" class="text-center">
@@ -55,35 +53,70 @@ templ pageIndex(parks []api.Park, placeName string, state string) {
 			event.detail.parameters.currentCount = currentCount;
 		}
 	});
-	// Initialize Mapbox Geocoder
-	initMapbox();
-	function initMapbox() {
-		mapboxgl.accessToken = "pk.eyJ1IjoiYm9nenoiLCJhIjoiY2x2MDU0NjBoMWwzYjJqbWpnazlpaGkzbiJ9.DbPQ3cgc-RxyA5vlEW0mdQ"
-		let geocoderElement = document.getElementById('geocoder');
-		geocoderElement.innerHTML = '';
-		let geocoder = new MapboxGeocoder({
-			accessToken: mapboxgl.accessToken,
-			mapboxgl: mapboxgl,
-			types: 'place',
-			countries: 'us',
-			language: 'en-US',
-			placeholder: 'Where are you?',
-		});
-		
-		geocoderElement.appendChild(geocoder.onAdd());
-		geocoder.on('result', function(e) {
-			let coords = e.result.geometry.coordinates;
-			let placeNameParts = e.result.place_name.split(',');
-			let placeName = placeNameParts[0];
-			let state = placeNameParts[1].trim();
-			let url = '/place/' + encodeURIComponent(placeName) + '/' + encodeURIComponent(state);
-			// Use HTMX to send coordinates to the server and get parks
-			htmx.ajax('GET', url, {
-				values: {longitude: coords[0], latitude: coords[1]},
-				target: '.htmx-body',
+	(function() {
+		// Function to load CSS dynamically
+		function loadCSS(href) {
+			const link = document.createElement('link');
+			link.rel = 'stylesheet';
+			link.href = href;
+			document.head.appendChild(link);
+		}
+
+		// Function to load JavaScript dynamically with error handling
+		function loadJS(src, callback) {
+			const script = document.createElement('script');
+			script.src = src;
+			script.onload = callback;
+			script.onerror = function() {
+				console.error('Script load failed:', src);
+			};
+			document.head.appendChild(script);
+		}
+
+		function initMapboxGeocoder() {
+			mapboxgl.accessToken = "pk.eyJ1IjoiYm9nenoiLCJhIjoiY2x2MDU0NjBoMWwzYjJqbWpnazlpaGkzbiJ9.DbPQ3cgc-RxyA5vlEW0mdQ";
+			const geocoderElement = document.getElementById('geocoder');
+			geocoderElement.innerHTML = ''; // Clear previous instances
+			const geocoder = new MapboxGeocoder({
+				accessToken: mapboxgl.accessToken,
+				mapboxgl: mapboxgl,
+				types: 'place',
+				countries: 'us',
+				language: 'en-US',
+				placeholder: 'Where are you?',
 			});
-		});
-	}
+
+			geocoderElement.appendChild(geocoder.onAdd());
+			geocoder.on('result', function(e) {
+				const coords = e.result.geometry.coordinates;
+				const placeNameParts = e.result.place_name.split(',');
+				const placeName = placeNameParts[0];
+				const state = placeNameParts[1].trim();
+				const url = `/place/${encodeURIComponent(placeName)}/${encodeURIComponent(state)}`;
+
+				htmx.ajax('GET', url, {
+					values: { longitude: coords[0], latitude: coords[1] },
+					target: '.htmx-body',
+				});
+			});
+		}
+
+		function initMapbox() {
+			if (typeof MapboxGeocoder === 'undefined') {
+				loadCSS('/mapbox-gl-geocoder.css');
+				loadJS('/mapbox-gl-geocoder.min.js', initMapboxGeocoder);
+			} else {
+				initMapboxGeocoder();
+			}
+		}
+
+		if (typeof mapboxgl === 'undefined') {
+			loadCSS('/mapbox-gl.css');
+			loadJS('/mapbox-gl.js', initMapbox);
+		} else {
+			initMapbox();
+		}
+	})();
 
 	window.onload = function() {
     // Check if Geolocation is supported
