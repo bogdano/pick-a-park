@@ -6,11 +6,11 @@ import (
  
 templ Parks(parks []api.Park, placeName string, stateName string) {
     if len(parks) == 0 {
-        <span class="font-bold text-stone-400">Please select your starting point!</span>
+        <span class="font-bold text-xl text-stone-400">Please select your starting point!</span>
     } else {
         <span class="dark:text-white font-bold text-xl text-stone-700">Parks near <span class="dark:text-lime-400 text-lime-700">{ placeName }, { stateName } <sup>*</sup></span></span>
     }
-    <div id="parks" class="max-w-6xl mx-auto flex gap-2 md:gap-4 flex-wrap justify-center mt-8 mb-12">
+    <div id="parks" class="max-w-6xl mx-auto flex gap-2 md:gap-4 flex-wrap justify-center md:mt-8 mt-4 mb-12">
         for _, park := range parks {
             @ParkCard(park, placeName, stateName)
         }

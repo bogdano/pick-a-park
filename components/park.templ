@@ -39,12 +39,12 @@ script redirect(parkCode string) {
 }
 
 templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
-	<div class="flex flex-col items-center justify-center pt-12 mb-8 gap-4">
+	<div class="flex flex-col items-center justify-center pt-12 md:mb-8 mb-4 gap-4">
 		<a href="/" hx-boost="false" class="block">
 			<img src="/logo.webp" alt="National Parks Finder logo" class="w-36 h-36" />
 		</a>
 		<div class="flex flex-col md:flex-row flex-wrap gap-3 mx-3 justify-center">
-			<div class="flex flex-row justify-center gap-3 mb-4 md:hidden">
+			<div class="flex flex-row justify-center gap-3 md:hidden">
 				<button onclick="history.back()" class="my-auto " id="backBtn">
 					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:fill-white dark:hover:bg-lime-900 fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
 						<title>Back</title>
@@ -68,7 +68,7 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 					<g id="SVGRepo_iconCarrier"> <path d="M4 10L3.29289 10.7071L2.58579 10L3.29289 9.29289L4 10ZM21 18C21 18.5523 20.5523 19 20 19C19.4477 19 19 18.5523 19 18L21 18ZM8.29289 15.7071L3.29289 10.7071L4.70711 9.29289L9.70711 14.2929L8.29289 15.7071ZM3.29289 9.29289L8.29289 4.29289L9.70711 5.70711L4.70711 10.7071L3.29289 9.29289ZM4 9L14 9L14 11L4 11L4 9ZM21 16L21 18L19 18L19 16L21 16ZM14 9C17.866 9 21 12.134 21 16L19 16C19 13.2386 16.7614 11 14 11L14 9Z" /> </g>
 				</svg>
 			</button>
-			<div class="flex flex-row justify-center flex-wrap gap-3">
+			<div class="flex flex-row justify-center flex-wrap md:gap-3 gap-1">
 				<h1 class="dark:text-amber-100 text-4xl md:text-5xl text-center my-auto text-stone-700 font-extrabold">{park.FullName}</h1>
 				<span class="text-xl text-center self-end mb-0.5 text-stone-500 font-bold">{park.States}</span>
 			</div>
@@ -142,15 +142,18 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 	<span class="text-stone-500 text-xs text-center w-full block font-bold mb-8">last updated: { lastUpdated(park.Weather[0].LastUpdated) }</span>
 
 	if placeName != "" {
-		<div id="directions" class="group bg-lime-700 text-white font-mono font-extrabold text-sm max-w-3xl mx-auto md:rounded-2xl px-8 py-6 mb-4 relative">
+		<div id="directions" class="group bg-lime-700 text-white font-mono font-extrabold text-sm max-w-3xl mx-auto md:rounded-2xl px-8 py-6 mb-4 relative overflow-hidden">
 			<div class="flex flex-col md:flex-row justify-between w-full items-center">
 				<div class="text-center font-bold md:text-lg">
 					<span>{ strings.Split(placeName, ",")[0] + ", " + strings.Split(placeName, ",")[1] }</span>
 				</div>
-				<a href={ templ.SafeURL(fmt.Sprintf("/park/%s", park.ParkCode)) } class="block flex-grow flex flex-col items-center mx-2 text-center">
+				<a href={ templ.SafeURL(fmt.Sprintf("https://www.google.com/maps/search/?api=1&query=%s,%s", park.Latitude, park.Longitude)) } target="blank" class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 md:rounded-2xl transition-opacity cursor-pointer flex justify-center items-center">
+					<img src="/gmaps.svg" alt="Navigate to Park" class="opacity-0 group-hover:opacity-100 w-20 h-20" />
+				</a>
+				<div class="block flex-grow flex flex-col items-center mx-2 text-center">
 					<span class="distance md:text-sm text-xs text-nowrap font-extrabold mb-2"
-						  distance-mi={ park.DrivingDistanceMi }
-						  distance-km={ park.DrivingDistanceKm }></span>
+						distance-mi={ park.DrivingDistanceMi }
+						distance-km={ park.DrivingDistanceKm }></span>
 					<div class="w-full flex items-center justify-center">
 						<div class="flex-grow border-t-2 border-white border-dashed hidden md:flex"></div>
 						<svg viewBox="0 0 24 24" class="w-6 h-6 fill-current ml-2 hidden md:block" xmlns="http://www.w3.org/2000/svg">
@@ -167,7 +170,7 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 							unreachable
 						}
 					</span>
-				</a>
+				</div>
 				<div class="text-center font-bold md:text-lg">
 					<span>{ trimParkName(park.FullName) }</span>
 				</div>

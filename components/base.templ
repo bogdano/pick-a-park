@@ -123,7 +123,7 @@ templ body(component templ.Component) {
 			updateUnits();
 		});
 
-		htmx.onLoad(function(evt) {
+		document.body.addEventListener('htmx:afterSwap', function(event) {
 			updateUnits();
 		});
 
@@ -133,14 +133,17 @@ templ body(component templ.Component) {
 			let temperatures = document.querySelectorAll('.temperature')
 			if (units) {
 				distances.forEach(function(distance) {
-					distance.innerHTML = distance.getAttribute('distance-km') + ' km'
+					dist = distance.getAttribute('distance-km')
+					distance.innerHTML = dist === "ocean" ? dist : dist + ' km'
 				})
 				temperatures.forEach(function(temperature) {
 					temperature.innerHTML = temperature.getAttribute('temp-C')
 				})
 			} else {
 				distances.forEach(function(distance) {
-					distance.innerHTML = distance.getAttribute('distance-mi') + ' mi'
+					dist = distance.getAttribute('distance-mi')
+					// if dist = "ocean", don't add "mi" to the end
+					distance.innerHTML = dist === "ocean" ? dist : dist + ' mi'
 				})
 				temperatures.forEach(function(temperature) {
 					temperature.innerHTML = temperature.getAttribute('temp-F')

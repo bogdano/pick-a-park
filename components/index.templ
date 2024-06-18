@@ -10,14 +10,16 @@ templ Index(parks []api.Park, placeName string, state string) {
 }
 
 templ pageIndex(parks []api.Park, placeName string, state string) {
-	<div class="flex flex-col items-center mx-auto text-center pt-12 mb-8">
+	<div class="flex flex-col items-center mx-auto text-center pt-12 md:mb-8 mb-4">
 		<a href="/" hx-boost="false" class="block">
-			<div class="flex flex-col items-center justify-center mx-3 gap-4 mb-8">
+			<div class="flex flex-col items-center justify-center mx-3 gap-4 md:mb-8 mb-4">
 				<img src="/logo.webp" alt="Pick A Park Logo" class="w-36 h-36" />
 				<h1 class="dark:text-amber-100 text-4xl md:text-5xl font-extrabold text-stone-700">Pick A Park</h1>
 			</div>
 		</a>
-		<div id="geocoder" class="geocoder rounded bg-stone-100"></div>
+		<div class="geocoder rounded bg-stone-100">
+			<div id="geocoder"></div>
+		</div>
 	</div>
 
 	<div id="parks-container" class="text-center">
@@ -38,21 +40,39 @@ templ pageIndex(parks []api.Park, placeName string, state string) {
 	}
 
 	<script>
-	// update the currentCount in load more button
-	document.addEventListener('htmx:configRequest', function(event) {
-		let currentCount = document.querySelectorAll('#parks .park-card').length;
-		if (typeof currentCount !== 'undefined' && window.location.pathname.startsWith('/place/')) {
-			if (currentCount >= 32 || currentCount == 0) {
-				// hide the button
-				document.getElementById('load-more-parks').style.display = 'none';
-			}
+	(function() {
+		// Check if Geolocation is supported
+		if (!navigator.geolocation) {
+			console.log("Geolocation is not supported by this browser.");
+			return;
+			// else if path != /
+		} else if (window.location.pathname != '/') {
+			return;
 		}
-		// if the hx-get url is load-more-parks, add currentCount to the url
-		let url = event.detail.path 
-		if (url && url.includes('load-more-parks')) {
-			event.detail.parameters.currentCount = currentCount;
-		}
-	});
+
+		// Get current position
+		navigator.geolocation.getCurrentPosition(function(position) {
+			let latitude = position.coords.latitude;
+			let longitude = position.coords.longitude;
+
+			// Use Mapbox Geocoding API to get place name
+			fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?types=place&countries=us&access_token=pk.eyJ1IjoiYm9nenoiLCJhIjoiY2x2MDU0NjBoMWwzYjJqbWpnazlpaGkzbiJ9.DbPQ3cgc-RxyA5vlEW0mdQ`)
+				.then(response => response.json())
+				.then(data => {
+					let placeNameParts = data.features[0].place_name.split(',');
+					let placeName = placeNameParts[0];
+					let state = placeNameParts[1].trim();
+					let url = '/place/' + encodeURIComponent(placeName) + '/' + encodeURIComponent(state);
+
+					// Use HTMX to send coordinates to the server and get parks
+					htmx.ajax('GET', url, {
+						values: {longitude: longitude, latitude: latitude},
+						target: '.htmx-body',
+					});
+				});
+		});
+	})();
+
 	(function() {
 		// Function to load CSS dynamically
 		function loadCSS(href) {
@@ -118,38 +138,21 @@ templ pageIndex(parks []api.Park, placeName string, state string) {
 		}
 	})();
 
-	window.onload = function() {
-    // Check if Geolocation is supported
-    if (!navigator.geolocation) {
-        console.log("Geolocation is not supported by this browser.");
-        return;
-		// else if path != /
-    } else if (window.location.pathname != '/') {
-		return;
-	}
-
-    // Get current position
-    navigator.geolocation.getCurrentPosition(function(position) {
-        let latitude = position.coords.latitude;
-        let longitude = position.coords.longitude;
-
-        // Use Mapbox Geocoding API to get place name
-        fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?types=place&countries=us&access_token=pk.eyJ1IjoiYm9nenoiLCJhIjoiY2x2MDU0NjBoMWwzYjJqbWpnazlpaGkzbiJ9.DbPQ3cgc-RxyA5vlEW0mdQ`)
-            .then(response => response.json())
-            .then(data => {
-                let placeNameParts = data.features[0].place_name.split(',');
-                let placeName = placeNameParts[0];
-                let state = placeNameParts[1].trim();
-                let url = '/place/' + encodeURIComponent(placeName) + '/' + encodeURIComponent(state);
-
-                // Use HTMX to send coordinates to the server and get parks
-                htmx.ajax('GET', url, {
-                    values: {longitude: longitude, latitude: latitude},
-                    target: '.htmx-body',
-                });
-            });
-    });
-}
+	// update the currentCount in load more button
+	document.addEventListener('htmx:configRequest', function(event) {
+		let currentCount = document.querySelectorAll('#parks .park-card').length;
+		if (typeof currentCount !== 'undefined' && window.location.pathname.startsWith('/place/')) {
+			if (currentCount >= 32 || currentCount == 0) {
+				// hide the button
+				document.getElementById('load-more-parks').style.display = 'none';
+			}
+		}
+		// if the hx-get url is load-more-parks, add currentCount to the url
+		let url = event.detail.path 
+		if (url && url.includes('load-more-parks')) {
+			event.detail.parameters.currentCount = currentCount;
+		}
+	});
 	</script>
 }
 

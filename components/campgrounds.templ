@@ -35,12 +35,12 @@ func campToJSON(campgrounds []api.Campground) string {
 }
 
 templ campgroundsInfo(park api.Park, campgrounds []api.Campground) {
-	<div class="flex flex-col items-center justify-center pt-12 mb-8 gap-4">
+	<div class="flex flex-col items-center justify-center pt-12 md:mb-8 mb-4 gap-4">
 		<a href="/" hx-boost="false" class="block">
 			<img src="/logo.webp" alt="National Parks Finder logo" class="w-36 h-36" />
 		</a>
 		<div class="flex flex-col md:flex-row flex-wrap gap-3 mx-3 justify-center">
-			<div class="flex flex-row justify-center gap-3 mb-4 md:hidden">
+			<div class="flex flex-row justify-center gap-3 md:hidden">
 				<button onclick="history.back()" class="my-auto " id="backBtn">
 					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:fill-white dark:hover:bg-lime-900 fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
 						<title>Back</title>
@@ -78,7 +78,7 @@ templ campgroundsInfo(park api.Park, campgrounds []api.Campground) {
 	</div>
 
 	<!-- mapbox map with all campgrounds -->
-	<div class="max-w-3xl mx-5 mb-8 md:mx-auto h-96 rounded-2xl" id="map" data-markers={ campToJSON(campgrounds) } data-lat={ park.Latitude } data-lon={ park.Longitude }></div>
+	<div class="max-w-3xl mx-5 mb-8 md:mx-auto h-96 rounded-2xl bg-stone-200" id="map" data-markers={ campToJSON(campgrounds) } data-lat={ park.Latitude } data-lon={ park.Longitude }></div>
 
     <div class="flex flex-col items-center gap-4 mb-24">
         <div class="max-w-3xl mx-auto">
@@ -132,12 +132,14 @@ templ campgroundsInfo(park api.Park, campgrounds []api.Campground) {
 				container: 'map',
 				cooperativeGestures: true,
 				style: 'mapbox://styles/mapbox/outdoors-v12?optimize=true',
+				center: [parseFloat(mapDiv.dataset.lon), parseFloat(mapDiv.dataset.lat)],
+				minZoom: 5,
 			});
-
-			processMarkers(markers, map);
-
-			map.addControl(new mapboxgl.NavigationControl());
-			map.addControl(new mapboxgl.FullscreenControl());
+			map.on('load', function() {
+				processMarkers(markers, map);
+				map.addControl(new mapboxgl.NavigationControl());
+				map.addControl(new mapboxgl.FullscreenControl());
+			});
 		}
 
 		function processMarkers(markers, map) {
@@ -151,7 +153,7 @@ templ campgroundsInfo(park api.Park, campgrounds []api.Campground) {
 				const bounds = coords.reduce((bounds, coord) => bounds.extend(coord), new mapboxgl.LngLatBounds(coords[0], coords[0]));
 				map.fitBounds(bounds, { padding: 50 });
 			} else if (coords.length === 1) {
-				map.flyTo({ center: coords[0], zoom: 15 });
+				map.flyTo({ center: coords[0], zoom: 13 });
 			}
 		}
 
@@ -164,7 +166,11 @@ templ campgroundsInfo(park api.Park, campgrounds []api.Campground) {
 				.addTo(map);
 		}
 
-		loadMapboxScripts(initMapboxMap);
+		if (typeof mapboxgl === 'undefined') {
+			loadMapboxScripts(initMapboxMap);
+		} else {
+			initMapboxMap();
+		}
 				
 		// share button
 		function share() {
