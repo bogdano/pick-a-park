@@ -419,11 +419,11 @@ func main() {
 		})
 
 		// route to fetch parks, commented because Pocketbase scheduler is set up to fetch parks every week
-		e.Router.GET("/update-park-data", api.FetchAndStoreNationalParksHTTP(app))
+		e.Router.GET("/api/update-park-data", api.FetchAndStoreNationalParksHTTP(app))
 		// route to fetch weather data
-		e.Router.GET("/update-weather-data", api.FetchAndStoreWeatherHTTP(app))
+		e.Router.GET("/api/update-weather-data", api.FetchAndStoreWeatherHTTP(app))
 		// route to fetch alerts
-		e.Router.GET("/update-alerts", api.FetchAlertsHTTP(app))
+		e.Router.GET("/api/update-alerts", api.FetchAlertsHTTP(app))
 
 		// Start a cron that fetches and stores National Parks data once a week
 		scheduler := cron.New()

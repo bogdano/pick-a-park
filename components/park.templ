@@ -45,7 +45,7 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 		</a>
 		<div class="flex flex-col md:flex-row flex-wrap gap-3 mx-3 justify-center">
 			<div class="flex flex-row justify-center gap-3 md:hidden">
-				<button onclick="history.back()" class="my-auto " id="backBtn">
+				<button onclick="history.back()" class="my-auto backBtn">
 					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:fill-white dark:hover:bg-lime-900 fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
 						<title>Back</title>
 						<g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -60,7 +60,7 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 					</svg>
 				</button>
 			</div>
-			<button onclick="history.back()" class="my-auto hidden md:block" id="backBtn">
+			<button onclick="history.back()" class="my-auto hidden md:block backBtn">
 				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:fill-white dark:hover:bg-lime-900  fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
 					<title>Back</title>
 					<g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -69,7 +69,7 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 				</svg>
 			</button>
 			<div class="flex flex-row justify-center flex-wrap md:gap-3 gap-1">
-				<h1 class="dark:text-amber-100 text-4xl md:text-5xl text-center my-auto text-stone-700 font-extrabold">{park.FullName}</h1>
+				<h1 id="main-title" class="dark:text-amber-100 text-4xl md:text-5xl text-center my-auto text-stone-700 font-extrabold">{park.FullName}</h1>
 				<span class="text-xl text-center self-end mb-0.5 text-stone-500 font-bold">{park.States}</span>
 			</div>
 			<button onclick="share();" class="my-auto hidden md:block">
@@ -214,7 +214,6 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 			</div>
 		</div>
 	}
-
 	<a  href={ templ.SafeURL(fmt.Sprintf("https://www.nps.gov/%s/planyourvisit/", park.ParkCode))} target="_blank" rel="noopener"
         class="flex flex-row items-center justify-center w-64 mx-auto mb-24 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
         <span class="mr-1">More Info</span>
@@ -224,7 +223,6 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 			</g>
 		</svg>
     </a>
-
 	<script>
 	// redirect to park page
 	function redirect(parkCode) {
@@ -235,12 +233,6 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 	}
 
 	(function() {
-		const backBtn = document.getElementById('backBtn')
-		if (!backBtn) return
-		if (window.history.length === 1) {
-			backBtn.style.display = 'none'
-		}
-
 		function loadScript(src, callback) {
 			const script = document.createElement('script');
 			script.src = src;
@@ -277,21 +269,6 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 			initSlider();
 		}
 	})();
-
-	// share button
-	function share() {
-		if (navigator.share) {
-			navigator.share({
-				title: document.querySelector('h1').textContent,
-				text: "Let's go on a roadtrip!",
-				url: window.location.href,
-			})
-		} else {
-			// copy url to clipboard
-			navigator.clipboard.writeText(window.location.href)
-			alert('Link copied to clipboard.')
-		}
-	}
 	</script>
 }
 

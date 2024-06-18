@@ -40,7 +40,7 @@ templ campgroundPage(campground api.Campground, parkName string, Id string) {
 				</svg>
 			</button>
 			<div class="flex flex-col justify-center flex-wrap">
-				<h1 class="dark:text-amber-100 text-4xl md:text-5xl text-center my-auto text-stone-700 font-extrabold">{ campground.Name }</h1>
+				<h1 id="main-title" class="dark:text-amber-100 text-4xl md:text-5xl text-center my-auto text-stone-700 font-extrabold">{ campground.Name }</h1>
 				<span class="text-2xl text-center mb-0.5 text-stone-500 font-bold">{ parkName }</span>
 			</div>
 			<button onclick="share();" class="my-auto hidden md:block">
@@ -141,28 +141,7 @@ templ campgroundPage(campground api.Campground, parkName string, Id string) {
 
 
     <script>
-		// share button
-		function share() {
-			if (navigator.share) {
-				navigator.share({
-					title: document.querySelector('h1').textContent,
-					text: "Let's go on a roadtrip!",
-					url: window.location.href,
-				})
-			} else {
-				// copy url to clipboard
-				navigator.clipboard.writeText(window.location.href)
-				alert('Link copied to clipboard.')
-			}
-		}
-
 		(function() {
-			const backBtn = document.getElementById('backBtn')
-			if (!backBtn) return
-			if (window.history.length === 1) {
-				backBtn.style.display = 'none'
-			}
-
 			function loadScript(src, callback) {
 				const script = document.createElement('script');
 				script.src = src;
