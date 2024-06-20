@@ -147,7 +147,7 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 				<div class="text-center font-bold md:text-lg">
 					<span>{ strings.Split(placeName, ",")[0] + ", " + strings.Split(placeName, ",")[1] }</span>
 				</div>
-				<a href={ templ.SafeURL(fmt.Sprintf("https://www.google.com/maps/search/?api=1&query=%s,%s", park.Latitude, park.Longitude)) } target="blank" class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 md:rounded-2xl transition-opacity cursor-pointer flex justify-center items-center">
+				<a href={ templ.SafeURL(fmt.Sprintf("https://www.google.com/maps/search/?api=1&query=%s,%s", park.Latitude, park.Longitude)) } target="blank" class="do-not-prerender absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 md:rounded-2xl transition-opacity cursor-pointer flex justify-center items-center">
 					<img src="/gmaps.svg" alt="Navigate to Park" class="opacity-0 group-hover:opacity-100 w-20 h-20" />
 				</a>
 				<div class="block flex-grow flex flex-col items-center mx-2 text-center">
@@ -214,8 +214,8 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 			</div>
 		</div>
 	}
-	<a  href={ templ.SafeURL(fmt.Sprintf("https://www.nps.gov/%s/planyourvisit/", park.ParkCode))} target="_blank" rel="noopener"
-        class="flex flex-row items-center justify-center w-64 mx-auto mb-24 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
+	<a  href={ templ.SafeURL(fmt.Sprintf("https://www.nps.gov/%s/planyourvisit/", park.ParkCode))} target="_blank"
+        class="do-not-prerender flex flex-row items-center justify-center w-64 mx-auto mb-24 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
         <span class="mr-1">More Info</span>
 		<svg class="h-5 w-5 text-white" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
 			<g id="Interface / External_Link">
@@ -262,6 +262,13 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 					indexEl.textContent = pageIndex + 1;
 				});
 			}
+			document.addEventListener('keydown', function(event) {
+				if (event.key === 'ArrowLeft') {
+					slider.prev()
+				} else if (event.key === 'ArrowRight') {
+					slider.next()
+				}
+			});
 		}
 		if (typeof BlazeSlider === 'undefined') {
 			loadScript('/blaze-slider.min.js', initSlider);
