@@ -6,3 +6,4 @@ main
 build-errors.log
 go-htmx
 /node_modules
+cluster.txt
