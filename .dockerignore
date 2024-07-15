@@ -7,4 +7,3 @@ tailwind.config.js
 .gitignore
 .env
 /node_modules
-cluster.txt

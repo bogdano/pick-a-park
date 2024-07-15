@@ -63,7 +63,7 @@ templ body(component templ.Component) {
 						</svg>
 					</button>
 					<a href="/" hx-boost="false" class="block">
-						<img class="w-10 h-10" src="/logo.webp" alt="National Parks Finder logo"/>
+						<img class="w-10 h-10 max-w-none" src="/logo.webp" alt="National Parks Finder logo"/>
 					</a>
 					<button onclick="share();" class="ml-8">
 						<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:text-white dark:hover:bg-lime-800 dark:bg-lime-950 dark:hover:bg-lime-900 text-lime-700 fill-none shadow-md h-10 w-10 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100" stroke="currentColor">
@@ -116,9 +116,9 @@ templ body(component templ.Component) {
 						</svg>
 					</label>
 					<label class="flex px-8 space-x-3 justify-center cursor-pointer">
-						<span class="dark:text-amber-50 font-mono text-gray-700">km | °C</span>
+						<span class="dark:text-amber-50 font-mono text-stone-700">km | °C</span>
 						<input type="checkbox" id="unitToggle"/>
-						<span class="dark:text-amber-50 font-mono text-gray-700">mi | °F</span>
+						<span class="dark:text-amber-50 font-mono text-stone-700">mi | °F</span>
 					</label>
 				</div>
 			</div>
@@ -126,6 +126,12 @@ templ body(component templ.Component) {
 		<div class="loading-bar"></div>
 		@component
 	</body>
+	<footer>
+	    <a href="https://bogz.dev/" rel="noopener" class="group flex flex-col justify-center items-center h-16 mt-24 bg-amber-100 text-stone-600 dark:bg-stone-800 dark:text-stone-200">
+            <span class="text-xs">made with ❤️ by <span class="text-amber-700 dark:text-amber-50 group-hover:underline">bogz.dev</span></span>
+            <span class="text-xs">hire me pls</span>
+        </a>
+    </footer>
 	<script defer>
 		htmx.config.scrollBehavior = 'auto';
 		// register service worker for offline support in PWA

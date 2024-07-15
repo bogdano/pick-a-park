@@ -29,14 +29,16 @@ templ pageIndex(parks []api.Park, placeName string, state string) {
 	if len(parks) != 0 {
 		<button id="load-more-parks"
 			hx-get={ fmt.Sprintf("/load-more-parks/%s/%s", placeName, state) }
-			hx-target="#parks" 
-			hx-swap="beforeend" 
+			hx-target="#parks"
+			hx-swap="beforeend"
 			hx-push-url="false"
 			hx-boost="false"
 			class="block w-64 mx-auto mb-8 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
 			Load More
 		</button>
-		<p class="dark:text-white text-xs mb-4 text-center mx-8"><sup class="dark:text-lime-400 text-base text-lime-800">*</sup> Parks are sorted by as-the-crow-flies distance from your location, and thus may not be sorted by driving distance.</p>
+		<div class="flex justify-center">
+		  <p class="dark:text-white max-w-2xl text-sm text-stone-700 text-center mx-8"><sup class="dark:text-lime-400 text-base text-lime-800">*</sup> Parks are sorted by as-the-crow-flies distance from your location, and thus may not be sorted by driving distance exactly.</p>
+		</div>
 	}
 
 	<script>
@@ -148,11 +150,10 @@ templ pageIndex(parks []api.Park, placeName string, state string) {
 			}
 		}
 		// if the hx-get url is load-more-parks, add currentCount to the url
-		let url = event.detail.path 
+		let url = event.detail.path
 		if (url && url.includes('load-more-parks')) {
 			event.detail.parameters.currentCount = currentCount;
 		}
 	});
 	</script>
 }
-

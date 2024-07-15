@@ -31,7 +31,7 @@ func lastUpdated(u string) string {
 	if updated.Minutes() < 60 {
 		return fmt.Sprintf("%d min", int(updated.Minutes()))
 	}
-	return fmt.Sprintf("%d hr", int(updated.Hours()))	
+	return fmt.Sprintf("%d hr", int(updated.Hours()))
 }
 
 script redirect(parkCode string) {
@@ -90,8 +90,8 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 			<div class="blaze-track-container md:rounded-2xl max-w-fit">
 				<div class="blaze-track">
 					for i, image := range park.Images {
-						<img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/eop7kcada8abcp4/%s/%s", park.ParkRecordId, image)))} 
-							alt="Park photo" 
+						<img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/eop7kcada8abcp4/%s/%s", park.ParkRecordId, image)))}
+							alt="Park photo"
 							class="park-photo w-auto object-cover block h-96"
 							if i > 0 {
 								loading="lazy"
@@ -121,8 +121,8 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 
 	<!-- weather data: Date, TemperatureDayF, TemperatureNightF, WeatherIcon -->
 	<span class="dark:text-amber-100 text-stone-700 font-bold text-sm w-full block text-center mb-3">Weather @ { trimParkName(park.FullName) }</span>
-	<div class="w-full overflow-x-auto hide-scrollbar px-2 lg:px-0 mb-3">
-		<div id="weather-data" class="flex flex-row gap-2 justify-center items-center w-full pb-2 pl-16 md:pl-0">
+	<div class="w-full overflow-x-auto hide-scrollbar lg:px-0 mb-3">
+		<div id="weather-data" class="flex flex-row gap-2 md:justify-center items-center pb-2 md:pl-0">
 			for _, date := range park.Weather {
 				<div class="flex flex-col items-center min-w-16">
 					<span class="dark:text-amber-50 text-sm text-stone-700">{date.Date}</span>
@@ -142,18 +142,19 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 	<span class="text-stone-500 text-xs text-center w-full block font-bold mb-8">last updated: { lastUpdated(park.Weather[0].LastUpdated) }</span>
 
 	if placeName != "" {
-		<div id="directions" class="group bg-lime-700 text-white font-mono font-extrabold text-sm max-w-3xl mx-auto md:rounded-2xl px-8 py-6 mb-4 relative overflow-hidden">
+		<div id="directions" class="group bg-lime-700 text-white font-mono max-w-3xl mx-auto md:rounded-2xl px-8 py-6 mb-4 relative overflow-hidden">
 			<div class="flex flex-col md:flex-row justify-between w-full items-center">
-				<div class="text-center font-bold md:text-lg">
+				<div class="text-center md:text-lg">
 					<span>{ strings.Split(placeName, ",")[0] + ", " + strings.Split(placeName, ",")[1] }</span>
 				</div>
 				<a href={ templ.SafeURL(fmt.Sprintf("https://www.google.com/maps/search/?api=1&query=%s,%s", park.Latitude, park.Longitude)) } target="blank" class="do-not-prerender absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 md:rounded-2xl transition-opacity cursor-pointer flex justify-center items-center">
 					<img src="/gmaps.svg" alt="Navigate to Park" class="opacity-0 group-hover:opacity-100 w-20 h-20" />
 				</a>
 				<div class="block flex-grow flex flex-col items-center mx-2 text-center">
-					<span class="distance md:text-sm text-xs text-nowrap font-extrabold mb-2"
+					<span class="distance md:text-lg text-xs text-nowrap font-bold mb-2"
 						distance-mi={ park.DrivingDistanceMi }
-						distance-km={ park.DrivingDistanceKm }></span>
+						distance-km={ park.DrivingDistanceKm }>
+					</span>
 					<div class="w-full flex items-center justify-center">
 						<div class="flex-grow border-t-2 border-white border-dashed hidden md:flex"></div>
 						<svg viewBox="0 0 24 24" class="w-6 h-6 fill-current ml-2 hidden md:block" xmlns="http://www.w3.org/2000/svg">
@@ -163,15 +164,15 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 							<g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M21.886 5.536A1.002 1.002 0 0 0 21 5H3a1.002 1.002 0 0 0-.822 1.569l9 13a.998.998 0 0 0 1.644 0l9-13a.998.998 0 0 0 .064-1.033zM12 17.243 4.908 7h14.184L12 17.243z"></path></g>
 						</svg>
 					</div>
-					<span class="md:text-sm text-xs text-nowrap font-extrabold mt-2">
+					<span class="md:text-lg text-xs text-nowrap font-bold mt-2">
 						if park.DriveTime != "" {
-							{ park.DriveTime + " hr" } 
+							{ park.DriveTime + " hr" }
 						} else {
 							unreachable
 						}
 					</span>
 				</div>
-				<div class="text-center font-bold md:text-lg">
+				<div class="text-center md:text-lg">
 					<span>{ trimParkName(park.FullName) }</span>
 				</div>
 			</div>
@@ -188,17 +189,17 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 			View Campgrounds
 		</a>
 	}
-	
+
 	<div class="dark:text-amber-50 text-center text-stone-700 text-lg max-w-4xl mx-4 md:mx-auto mb-8 break-words">
 		{park.DirectionsInfo}
 	</div>
-	
+
 	if len(alerts) > 0 {
 		<div class="flex flex-col items-center gap-4 mb-8">
 			<span class="text-white bg-red-900 px-4 py-1 font-bold text-2xl rounded">Alerts</span>
 			<div class="max-w-3xl mx-auto">
 				for _, alert := range alerts {
-					<div class={"p-4 md:rounded-2xl mb-2 md:mb-4 relative group", 
+					<div class={"p-4 md:rounded-2xl mb-2 md:mb-4 relative group",
 								templ.KV("dark:bg-red-700 dark:bg-opacity-60 dark:text-red-100 bg-red-100 text-red-800", alert.Category == "Danger" || alert.Category == "Park Closure"),
 								templ.KV("dark:bg-amber-700 dark:bg-opacity-80 dark:text-amber-100 bg-amber-100 text-amber-800", alert.Category == "Caution"),
 								templ.KV("dark:bg-green-900 dark:text-green-100 bg-green-100 text-green-800", alert.Category == "Information"),
@@ -278,4 +279,3 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 	})();
 	</script>
 }
-
