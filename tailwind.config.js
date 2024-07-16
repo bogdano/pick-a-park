@@ -2,7 +2,7 @@
 module.exports = {
   content: ["./components/**/*.templ"],
   theme: {
-    extend: {},
+      extend: {},
   },
   plugins: [
     require('@tailwindcss/forms'),

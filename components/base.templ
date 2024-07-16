@@ -50,7 +50,7 @@ templ head(title string) {
 }
 
 templ body(component templ.Component) {
-	<body class="htmx-body mx-auto w-full min-h-lvh relative bg-white dark:bg-stone-900" hx-boost="true" hx-swap="innerHTML transition:true" hx-indicator=".loading-bar">
+	<body class="htmx-body mx-auto w-full relative bg-white dark:bg-stone-900" hx-boost="true" hx-swap="innerHTML transition:true" hx-indicator=".loading-bar">
 		<div id="top-bar" class="dark:bg-stone-900 fixed top-0 left-0 w-full bg-white shadow-md transition-opacity duration-300 opacity-0 invisible z-50">
 			<div class="flex items-center justify-between max-w-7xl mx-auto px-4 py-4">
 				<div class="flex items-center absolute left-1/2 transform -translate-x-1/2">
@@ -128,12 +128,12 @@ templ body(component templ.Component) {
 	</body>
 	<footer>
 	    <a href="https://bogz.dev/" rel="noopener" class="group flex flex-col justify-center items-center h-16 mt-24 bg-amber-100 text-stone-600 dark:bg-stone-800 dark:text-stone-200">
-            <span class="text-xs">made with ❤️ by <span class="text-amber-700 dark:text-amber-50 group-hover:underline">bogz.dev</span></span>
+            <span class="text-xs">made with ❤️ by <span class="text-amber-700 dark:text-amber-200 group-hover:underline">bogz.dev</span></span>
             <span class="text-xs">hire me pls</span>
         </a>
     </footer>
 	<script defer>
-		htmx.config.scrollBehavior = 'auto';
+		htmx.config.scrollBehavior = 'instant';
 		// register service worker for offline support in PWA
 		if ('serviceWorker' in navigator) {
 			window.addEventListener('load', function() {

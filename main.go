@@ -313,6 +313,7 @@ func main() {
 					placePark.Set("drivingDistanceMi", park.DrivingDistanceMi)
 					placePark.Set("drivingDistanceKm", park.DrivingDistanceKm)
 					placePark.Set("driveTime", park.DriveTime)
+					placePark.Set("haversineDistance", park.HaversineDistance)
 					if err := app.Dao().SaveRecord(placePark); err != nil {
 						return err
 					}
