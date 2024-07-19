@@ -4,25 +4,27 @@ import (
     "go-htmx/api"
     "fmt"
 )
- 
+
 templ ParkCard(park api.Park, placeName string, stateName string) {
-    <a  href={ templ.SafeURL(fmt.Sprintf("/park/%s?q=%s,%s", park.ParkCode, placeName, stateName)) } 
-        class="park-card dark:bg-lime-900 dark:text-white bg-amber-50 block group rounded-xl shadow-md w-44 md:w-64 transition-all duration-300 ease-in-out hover:text-white hover:bg-lime-700">
+    <a  hx-get={ fmt.Sprintf("/park/%s?q=%s,%s", park.ParkCode, placeName, stateName) }
+        hx-target="#main"
+        hx-push-url="true"
+        class="park-card cursor-pointer dark:bg-lime-900 dark:text-white bg-amber-50 block group rounded-xl shadow-md w-44 md:w-64 transition-all duration-300 ease-in-out hover:text-white hover:bg-lime-700">
         <div class="flex flex-col">
             <div class="rounded-t-xl h-44 md:h-64 w-full bg-stone-200 overflow-hidden">
-                <img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/eop7kcada8abcp4/%s/%s?thumb=500x500", park.ParkRecordId, park.Images[0])))} 
+                <img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/eop7kcada8abcp4/%s/%s?thumb=500x500", park.ParkRecordId, park.Images[0])))}
                     alt={ park.FullName }
                     class="rounded-t-xl object-cover h-44 md:h-64 w-full transition-transform duration-300 ease-in-out transform group-hover:scale-105"
                     loading="lazy" />
             </div>
             <div class="flex flex-col text-pretty px-2 py-4">
-                <span class="font-bold text-lg">{ park.FullName }</span> 
+                <span class="font-bold text-lg">{ park.FullName }</span>
                 <div class="flex flex-row mx-auto">
                     <span class="distance dark:text-stone-300 font-bold text-stone-500 group-hover:text-white"
                         distance-km={ park.DrivingDistanceKm }
                         distance-mi={ park.DrivingDistanceMi }></span><span class="dark:text-stone-300 font-bold text-stone-500 group-hover:text-white">
                         if park.DrivingDistanceMi != "ocean" {
-                            { ", " + park.DriveTime + " hr" } 
+                            { ", " + park.DriveTime + " hr" }
                         }
                     </span>
                 </div>

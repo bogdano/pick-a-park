@@ -50,7 +50,10 @@ templ head(title string) {
 }
 
 templ body(component templ.Component) {
-	<body class="htmx-body mx-auto w-full relative bg-white dark:bg-stone-900" hx-boost="true" hx-swap="innerHTML transition:true" hx-indicator=".loading-bar">
+  <body id="htmx-body" hx-boost="true" hx-swap="show:top" class="mx-auto w-full relative bg-white dark:bg-stone-900">
+    <a href="/" class="logo flex justify-center pt-12">
+			<img src="/logo.webp" alt="National Parks Finder logo" class="w-36 h-36" />
+		</a>
 		<div id="top-bar" class="dark:bg-stone-900 fixed top-0 left-0 w-full bg-white shadow-md transition-opacity duration-300 opacity-0 invisible z-50">
 			<div class="flex items-center justify-between max-w-7xl mx-auto px-4 py-4">
 				<div class="flex items-center absolute left-1/2 transform -translate-x-1/2">
@@ -62,7 +65,7 @@ templ body(component templ.Component) {
 							<g id="SVGRepo_iconCarrier"><path d="M4 10L3.29289 10.7071L2.58579 10L3.29289 9.29289L4 10ZM21 18C21 18.5523 20.5523 19 20 19C19.4477 19 19 18.5523 19 18L21 18ZM8.29289 15.7071L3.29289 10.7071L4.70711 9.29289L9.70711 14.2929L8.29289 15.7071ZM3.29289 9.29289L8.29289 4.29289L9.70711 5.70711L4.70711 10.7071L3.29289 9.29289ZM4 9L14 9L14 11L4 11L4 9ZM21 16L21 18L19 18L19 16L21 16ZM14 9C17.866 9 21 12.134 21 16L19 16C19 13.2386 16.7614 11 14 11L14 9Z"></path> </g>
 						</svg>
 					</button>
-					<a href="/" hx-boost="false" class="block">
+					<a href="/" class="block">
 						<img class="w-10 h-10 max-w-none" src="/logo.webp" alt="National Parks Finder logo"/>
 					</a>
 					<button onclick="share();" class="ml-8">
@@ -123,8 +126,10 @@ templ body(component templ.Component) {
 				</div>
 			</div>
 		</div>
-		<div class="loading-bar"></div>
-		@component
+	  <div class="loading-bar"></div>
+		<div id="main" class="main" hx-swap="innerHTML show:#htmx-body:top transition:true" hx-indicator=".loading-bar">
+		  @component
+		</div>
 	</body>
 	<footer>
 	    <a href="https://bogz.dev/" rel="noopener" class="group flex flex-col justify-center items-center h-16 mt-24 bg-amber-100 text-stone-600 dark:bg-stone-800 dark:text-stone-200">
@@ -133,7 +138,8 @@ templ body(component templ.Component) {
         </a>
     </footer>
 	<script defer>
-		htmx.config.scrollBehavior = 'instant';
+		htmx.config.scrollBehavior = 'auto';
+		htmx.config.scrollIntoViewOnBoost = false;
 		// register service worker for offline support in PWA
 		if ('serviceWorker' in navigator) {
 			window.addEventListener('load', function() {
@@ -211,13 +217,20 @@ templ body(component templ.Component) {
 			}
 		}
 
+		function showBackBtn() {
+    		const backBtn = document.querySelectorAll(".backBtn")
+            if (!window.history.state || window.location.pathname.includes('/place/')) {
+                if (!window.location.pathname.includes('/campground/')) {
+                    backBtn.forEach(btn => btn.style.display = "none")
+                }
+            } else {
+                backBtn.forEach(btn => {if (!btn.classList.contains("mobile")) btn.style.display = "block";})
+            }
+		}
+
 		(function() {
-			const backBtn = document.querySelectorAll(".backBtn")
-			if (!window.history.state || window.location.pathname.includes('/place/')) {
-				if (!window.location.pathname.includes('/campground/')) {
-					backBtn.forEach(btn => btn.style.display = "none")
-				}
-			}
+            document.addEventListener('DOMContentLoaded', showBackBtn)
+            document.addEventListener('htmx:afterSettle', showBackBtn)
 
 			const topBar = document.getElementById('top-bar');
 			const mainTitle = document.getElementById('main-title').offsetTop;

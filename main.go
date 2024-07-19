@@ -49,7 +49,6 @@ func main() {
 	// serves static files from the provided public dir (if exists)
 	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
 		template.NewTemplateRenderer(e.Router)
-
 		// set to ./pb_public when running locally
 		e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS("pb_public"), false))
 
@@ -134,7 +133,12 @@ func main() {
 						placeName = placeRecord.GetString("placeName")
 					}
 				}
-				return template.Html(c, components.Park(park, placeName, alerts))
+				// if contains hx-request header:
+				if c.Request().Header.Get("hx-request") == "true" {
+					return template.Html(c, components.ParkInfo(park, placeName, alerts))
+				} else {
+					return template.Html(c, components.Park(park, placeName, alerts))
+				}
 			} else {
 				// Redirect to home page if park not found
 				return c.Redirect(http.StatusFound, "/")
@@ -176,7 +180,12 @@ func main() {
 					ParkRecordId: parkRecord.Id,
 					ParkCode:     parkCode,
 				}
-				return template.Html(c, components.Campgrounds(park, campgrounds))
+				// if contains hx-request header:
+				if c.Request().Header.Get("hx-request") == "true" {
+					return template.Html(c, components.CampgroundsInfo(park, campgrounds))
+				} else {
+					return template.Html(c, components.Campgrounds(park, campgrounds))
+				}
 			} else {
 				// Redirect to home page if park not found
 				return c.Redirect(http.StatusFound, "/")
@@ -211,7 +220,12 @@ func main() {
 				campground.ParkCode = park.GetString("parkCode")
 				parkName := park.GetString("name")
 				Id := campgroundRecord.Id
-				return template.Html(c, components.Campground(campground, parkName, Id))
+				// if contains hx-request header:
+				if c.Request().Header.Get("hx-request") == "true" {
+					return template.Html(c, components.CampgroundInfo(campground, parkName, Id))
+				} else {
+					return template.Html(c, components.Campground(campground, parkName, Id))
+				}
 			}
 			return template.Html(c, components.Error(404, "Campground not found"))
 		})

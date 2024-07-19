@@ -6,14 +6,11 @@ import (
 )
 
 templ Campground(campground api.Campground, parkName string, Id string) {
-	@Page(campground.Name, campgroundPage(campground, parkName, Id))
+	@Page(campground.Name, CampgroundInfo(campground, parkName, Id))
 }
 
-templ campgroundPage(campground api.Campground, parkName string, Id string) {
-    <div class="flex flex-col items-center justify-center pt-12 md:mb-8 mb-4 gap-4">
-		<a href="/" hx-boost="false" class="block">
-			<img src="/logo.webp" alt="National Parks Finder logo" class="w-36 h-36" />
-		</a>
+templ CampgroundInfo(campground api.Campground, parkName string, Id string) {
+    <div class="flex flex-col items-center justify-center pt-4 md:mb-8 mb-4 gap-4">
 		<div class="flex flex-col md:flex-row flex-wrap gap-5 mx-3 justify-center">
 			<div class="flex flex-row justify-center gap-3 md:hidden">
 				<button onclick="history.back()" class="backBtn my-auto">
@@ -31,7 +28,7 @@ templ campgroundPage(campground api.Campground, parkName string, Id string) {
 					</svg>
 				</button>
 			</div>
-			<button onclick="history.back()" class="backBtn my-auto hidden md:block">
+			<button onclick="history.back()" class="backBtn my-auto hidden md:block mobile">
 				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:fill-white dark:hover:bg-lime-900 fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
 					<title>Back</title>
 					<g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -95,11 +92,11 @@ templ campgroundPage(campground api.Campground, parkName string, Id string) {
 				<div class="blaze-track-container md:rounded-2xl max-w-fit">
 					<div class="blaze-track">
 						for i, image := range campground.Images {
-							<img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/cnpa06hb04mppdu/%s/%s", Id, image)))} 
-								alt="Park photo" 
+							<img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/cnpa06hb04mppdu/%s/%s", Id, image)))}
+								alt="Park photo"
 								class="park-photo w-auto object-cover block h-96"
 								if i > 0 {
-									loading="lazy" 
+									loading="lazy"
 								}
 							/>
 						}
@@ -134,7 +131,7 @@ templ campgroundPage(campground api.Campground, parkName string, Id string) {
 					</g>
 				</svg>
 			</a>
-		} else { 
+		} else {
 			<div class="mb-24"></div>
 		}
 	}

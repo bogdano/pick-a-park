@@ -8,7 +8,7 @@ import (
 )
 
 templ Park(park api.Park, placeName string, alerts []api.Alert) {
-	@Page(park.FullName, parkInfo(park, placeName, alerts))
+	@Page(park.FullName, ParkInfo(park, placeName, alerts))
 }
 
 func trimParkName(fullName string) string {
@@ -38,11 +38,8 @@ script redirect(parkCode string) {
 	redirect(parkCode)
 }
 
-templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
-	<div class="flex flex-col items-center justify-center pt-12 md:mb-8 mb-4 gap-4">
-		<a href="/" hx-boost="false" class="block">
-			<img src="/logo.webp" alt="National Parks Finder logo" class="w-36 h-36" />
-		</a>
+templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
+	<div class="flex flex-col items-center justify-center pt-4 md:mb-8 mb-4 gap-4">
 		<div class="flex flex-col md:flex-row flex-wrap gap-3 mx-3 justify-center">
 			<div class="flex flex-row justify-center gap-3 md:hidden">
 				<button onclick="history.back()" class="my-auto backBtn">
@@ -60,7 +57,7 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 					</svg>
 				</button>
 			</div>
-			<button onclick="history.back()" class="my-auto hidden md:block backBtn">
+			<button onclick="history.back()" class="my-auto hidden md:block backBtn mobile">
 				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="dark:bg-lime-950 dark:fill-white dark:hover:bg-lime-900  fill-lime-700 shadow-md h-12 w-12 border border-lime-700 rounded-xl align-middle p-1 hover:bg-lime-100">
 					<title>Back</title>
 					<g id="SVGRepo_bgCarrier" stroke-width="0"/>
@@ -184,7 +181,9 @@ templ parkInfo(park api.Park, placeName string, alerts []api.Alert) {
 		</div>
 	}
 	if park.Campgrounds > 0 {
-		<a 	href={ templ.SafeURL(fmt.Sprintf("/campgrounds/%s", park.ParkCode)) }
+		<a 	hx-get={ fmt.Sprintf("/campgrounds/%s", park.ParkCode) }
+		    hx-target="#main"
+			hx-push-url="true"
 			class="block w-72 mx-auto mb-8 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
 			View Campgrounds
 		</a>
