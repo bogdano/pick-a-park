@@ -25,32 +25,14 @@ templ head(title string) {
 		<link rel="manifest" crossorigin="use-credentials" href="/manifest.json"/>
 		<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#4d7c0f"/>
 		<script src="/htmx.min.js"></script>
+		<script src="/htmx-preload.min.js"></script>
 		<script defer src="https://cloud.umami.is/script.js" data-website-id="66465c10-c517-4d2a-9475-e11db838b937"></script>
 		<title>{ title }</title>
-		<script type="speculationrules">
-			{
-				"prerender": [{
-					"where": {
-						"and": [
-							{ "href_matches": "/*" },
-							{ "not": { "href_matches": "/api/*" }},
-							{ "not": { "selector_matches": ".do-not-prerender" }}
-						]
-					}
-				}],
-				"prefetch": [
-					{
-						"where": { "not": { "selector_matches": ".do-not-prerender" }},
-						"eagerness": "moderate"
-					}
-				]
-			}
-		</script>
 	</head>
 }
 
 templ body(component templ.Component) {
-    <body id="htmx-body" class="mx-auto w-full relative bg-white dark:bg-stone-900">
+    <body id="htmx-body" hx-ext="preload" class="mx-auto w-full relative bg-white dark:bg-stone-900">
        	<div id="top-bar" class="dark:bg-stone-900 fixed top-0 left-0 w-full bg-white shadow-md transition-opacity duration-300 opacity-0 invisible z-50">
 			<div class="flex items-center justify-between max-w-7xl mx-auto px-4 py-4">
 				<div class="flex items-center absolute left-1/2 transform -translate-x-1/2">

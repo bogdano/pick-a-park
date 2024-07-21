@@ -27,7 +27,8 @@ templ pageIndex(parks []api.Park, placeName string, state string) {
 			hx-target="#parks"
 			hx-swap="beforeend"
 			hx-push-url="false"
-			hx-boost="false"
+			preload
+			preload-images="true"
 			class="block w-64 mx-auto mb-8 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
 			Load More
 		</button>
