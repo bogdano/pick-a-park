@@ -35,7 +35,7 @@ func campToJSON(campgrounds []api.Campground) string {
 }
 
 templ CampgroundsInfo(park api.Park, campgrounds []api.Campground) {
-	<div class="flex flex-col items-center justify-center pt-4 md:mb-8 mb-4 gap-4">
+	<div class="flex flex-col items-center justify-center pt-4 mb-4 gap-4">
 		<div class="flex flex-col md:flex-row flex-wrap gap-3 mx-3 justify-center">
 			<div class="flex flex-row justify-center gap-3 md:hidden">
 				<button onclick="history.back()" class="my-auto backBtn">
@@ -81,7 +81,6 @@ templ CampgroundsInfo(park api.Park, campgrounds []api.Campground) {
         <div class="max-w-3xl mx-auto">
             for _, campground := range campgrounds {
                 <a href={ templ.SafeURL(fmt.Sprintf("/campground/%s", campground.Id)) } id={ fmt.Sprintf("camp-%s", campground.Id) }
-				   hx-boost="false"
 				   class={ "dark:bg-opacity-10 dark:bg-amber-500 dark:border-amber-600 dark:hover:bg-opacity-20 hover:bg-amber-200 border border-amber-300 mx-5 flex justify-between items-center p-4 rounded-2xl mb-4 cursor-pointer group bg-amber-100", templ.KV("dark:bg-green-500 dark:border-green-500 border-green-300 hover:bg-green-200 bg-green-100", campground.FirstComeFirstServe != "0") }>
                     <div class="flex flex-col">
 						<p class={ "dark:text-amber-50 text-amber-700 font-bold text-xl", templ.KV("text-green-700", campground.FirstComeFirstServe != "0") }>{ strings.ToUpper(campground.Name) }</p>

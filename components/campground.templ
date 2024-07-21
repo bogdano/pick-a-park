@@ -10,7 +10,7 @@ templ Campground(campground api.Campground, parkName string, Id string) {
 }
 
 templ CampgroundInfo(campground api.Campground, parkName string, Id string) {
-    <div class="flex flex-col items-center justify-center pt-4 md:mb-8 mb-4 gap-4">
+    <div class="flex flex-col items-center justify-center pt-4 mb-4 gap-4">
 		<div class="flex flex-col md:flex-row flex-wrap gap-5 mx-3 justify-center">
 			<div class="flex flex-row justify-center gap-3 md:hidden">
 				<button onclick="history.back()" class="backBtn my-auto">
@@ -50,7 +50,7 @@ templ CampgroundInfo(campground api.Campground, parkName string, Id string) {
 	</div>
 
 	if campground.MapImage != "" {
-		<div class="max-w-3xl mx-5 mb-4 md:mx-auto h-96 rounded-2xl bg-stone-200 relative overflow-hidden">
+		<div class="max-w-3xl mx-5 mb-4 md:mx-auto h-96 rounded-2xl bg-stone-200 dark:bg-stone-500 relative overflow-hidden">
 			<img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/cnpa06hb04mppdu/%s/%s", Id, campground.MapImage)))} alt="campground map" class="w-full h-full rounded-2xl object-cover object-center" loading="lazy" />
     		<a href={ templ.SafeURL(fmt.Sprintf("https://www.google.com/maps/search/?api=1&query=%s,%s", campground.Latitude, campground.Longitude))} target="blank" class="do-not-prerender absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 rounded-2xl transition-opacity cursor-pointer flex justify-center items-center group">
 				<img src="/gmaps.svg" alt="Camp Location" class="opacity-0 group-hover:opacity-100 w-20 h-20" />
@@ -89,7 +89,7 @@ templ CampgroundInfo(campground api.Campground, parkName string, Id string) {
 	if len(campground.Images) > 0 {
 		<div class="blaze-slider mb-8 w-full">
 			<div class="blaze-container max-w-3xl mx-auto">
-				<div class="blaze-track-container md:rounded-2xl max-w-fit">
+				<div class="blaze-track-container md:rounded-2xl bg-stone-200 dark:bg-stone-500 max-w-fit">
 					<div class="blaze-track">
 						for i, image := range campground.Images {
 							<img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/cnpa06hb04mppdu/%s/%s", Id, image)))}

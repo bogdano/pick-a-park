@@ -4,7 +4,7 @@
 #
 
 app = 'pick-a-park'
-primary_region = 'sea'
+primary_region = 'ord'
 
 [build]
 

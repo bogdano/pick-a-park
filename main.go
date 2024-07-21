@@ -40,12 +40,6 @@ func main() {
 		Automigrate: isGoRun,
 	})
 
-	// app.OnBeforeApiError().Add(func(e *core.ApiErrorEvent) error {
-	// 	log.Println("API Error:", e.Error)
-	// 	// send error code and message to error template
-	// 	return template.Html(e.HttpContext, components.Error(404, e.Error.Error()))
-	// })
-
 	// serves static files from the provided public dir (if exists)
 	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
 		template.NewTemplateRenderer(e.Router)
@@ -452,8 +446,8 @@ func main() {
 			}
 			log.Println("National Parks data fetched and stored!")
 		})
-		// update weather data every 4 hours
-		scheduler.MustAdd("updateWeather", "0 */4 * * *", func() {
+		// update weather data every 4 hours, at 10 minutes past the hour
+		scheduler.MustAdd("updateWeather", "10 */4 * * *", func() {
 			log.Println("Fetching and storing weather data...")
 			err := api.FetchAndStoreWeather(app)
 			if err != nil {
@@ -462,8 +456,8 @@ func main() {
 			}
 			log.Println("Weather data fetched and stored!")
 		})
-		// update alerts every 24 hours
-		scheduler.MustAdd("updateAlerts", "0 0 * * *", func() {
+		// update alerts every 6 hours, at 15 minutes past the hour
+		scheduler.MustAdd("updateAlerts", "15 */6 * * *", func() {
 			log.Println("Fetching and storing alerts data...")
 			err := api.FetchAlerts(app)
 			if err != nil {

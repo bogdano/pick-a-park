@@ -10,7 +10,7 @@ templ Index(parks []api.Park, placeName string, state string) {
 }
 
 templ pageIndex(parks []api.Park, placeName string, state string) {
-	<div class="flex flex-col items-center mx-auto text-center pt-4 md:mb-8 mb-4">
+	<div class="flex flex-col items-center mx-auto text-center pt-4 mb-4">
 		<h1 id="main-title" class="dark:text-amber-100 text-4xl md:text-5xl font-extrabold text-stone-700 md:mb-8 mb-4">Pick A Park</h1>
 		<div class="geocoder rounded bg-stone-100">
 			<div id="geocoder"></div>
@@ -138,15 +138,15 @@ templ pageIndex(parks []api.Park, placeName string, state string) {
 	// update the currentCount in load more button
 	document.addEventListener('htmx:configRequest', function(event) {
 		let currentCount = document.querySelectorAll('#parks .park-card').length;
-		if (typeof currentCount !== 'undefined' && window.location.pathname.startsWith('/place/')) {
-			if (currentCount >= 32 || currentCount == 0) {
-				// hide the button
-				document.getElementById('load-more-parks').style.display = 'none';
-			}
-		}
-		// if the hx-get url is load-more-parks, add currentCount to the url
 		let url = event.detail.path
+		// if the hx-get url is load-more-parks, add currentCount to the url
 		if (url && url.includes('load-more-parks')) {
+    		if (typeof currentCount !== 'undefined' && window.location.pathname.startsWith('/place/')) {
+    			if (currentCount >= 32 || currentCount == 0) {
+    				// hide the button
+    				document.getElementById('load-more-parks').style.display = 'none';
+    			}
+    		}
 			event.detail.parameters.currentCount = currentCount;
 		}
 	});

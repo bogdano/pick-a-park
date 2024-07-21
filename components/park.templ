@@ -39,7 +39,7 @@ script redirect(parkCode string) {
 }
 
 templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
-	<div class="flex flex-col items-center justify-center pt-4 md:mb-8 mb-4 gap-4">
+	<div class="flex flex-col items-center justify-center pt-4 mb-4 gap-4">
 		<div class="flex flex-col md:flex-row flex-wrap gap-3 mx-3 justify-center">
 			<div class="flex flex-row justify-center gap-3 md:hidden">
 				<button onclick="history.back()" class="my-auto backBtn">
@@ -84,7 +84,7 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 
 	<div class="blaze-slider mb-8">
 		<div class="blaze-container max-w-3xl mx-auto">
-			<div class="blaze-track-container md:rounded-2xl max-w-fit">
+			<div class="blaze-track-container md:rounded-2xl bg-stone-200 dark:bg-stone-500 max-w-fit">
 				<div class="blaze-track">
 					for i, image := range park.Images {
 						<img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/eop7kcada8abcp4/%s/%s", park.ParkRecordId, image)))}
