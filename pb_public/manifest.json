@@ -1,0 +1,40 @@
+{
+    "name": "Pick A Park",
+    "short_name": "Pick A Park",
+    "description": "Find a National Park near you, and pick a campsite!",
+    "start_url": "/",
+    "display": "standalone",
+    "scope": "/",
+    "orientation": "portrait",
+    "background_color": "#ffffff",
+    "theme_color": "#4d7c0f",
+    "status_bar": "default",
+    "icons": [
+        {
+            "src": "/android-chrome-192x192.png", "type": "image/png", "sizes": "192x192"
+          }, 
+          {
+            "src": "/android-chrome-512x512.png", "type": "image/png", "sizes": "512x512"
+          }
+    ],
+    "screenshots": [
+        {
+            "src": "/screenshot-1.png", "type": "image/png", "sizes": "3840x1926", "form_factor": "wide"
+        },
+        {
+            "src": "/screenshot-2.png", "type": "image/png", "sizes": "3840x1926", "form_factor": "wide"
+        },
+        {
+            "src": "/screenshot-mobile-1.png", "type": "image/png", "sizes": "824x1766"
+        },
+        {
+            "src": "/screenshot-mobile-2.png", "type": "image/png", "sizes": "824x1766"
+        }
+    ],
+    "dir": "ltr",
+    "lang": "en-US",
+    "launch_handler": {
+        "client_mode": "navigate-existing"
+    },
+    "handle-links": "preferred"
+}

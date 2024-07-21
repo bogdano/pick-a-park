@@ -1,8 +1,6 @@
 /pb_data
-/pb_public
 *_templ.go
 main
 .env
 build-errors.log
-go-htmx
 /node_modules
