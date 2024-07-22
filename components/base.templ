@@ -18,7 +18,7 @@ templ head(title string) {
 		<link rel="stylesheet" href="/tailwind.css"/>
 		<link rel="preconnect" href="https://fonts.googleapis.com"/>
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-		<link href="https://fonts.googleapis.com/css2?family=Sedan+SC&display=swap" rel="stylesheet"/>
+		<link href="https://fonts.googleapis.com/css2?family=Sedan+SC&family=Lato:wght@400;700;900&display=swap" rel="stylesheet"/>
 		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
 		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
 		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"/>
@@ -112,7 +112,7 @@ templ body(component templ.Component) {
       </div>
       <div>
         <div class="loading-bar"></div>
-     	<div id="main" class="main" hx-swap="innerHTML show:#htmx-body:top transition:true" hx-indicator=".loading-bar">
+     	<div id="main" class="main" hx-swap="innerHTML show:#htmx-body:top transition:true" hx-indicator=".loading-bar" hx-history-elt>
        	  @component
      	</div>
       </div>
@@ -214,9 +214,7 @@ templ body(component templ.Component) {
 		}
 
 		(function() {
-            document.addEventListener('DOMContentLoaded', showBackBtn)
             document.addEventListener('htmx:afterSettle', showBackBtn)
-
 			const topBar = document.getElementById('top-bar');
 			const mainTitle = document.getElementById('main-title').offsetTop;
 			window.addEventListener('scroll', () => {
