@@ -2,14 +2,13 @@ package components
 
 import (
 	"go-htmx/api"
-	"fmt"
 )
 
 templ Index(parks []api.Park, placeName string, state string) {
-	@Page("Pick A Park!", pageIndex(parks, placeName, state))
+	@Page("Pick A Park!", PageIndex(parks, placeName, state))
 }
 
-templ pageIndex(parks []api.Park, placeName string, state string) {
+templ PageIndex(parks []api.Park, placeName string, state string) {
 	<div class="flex flex-col items-center mx-auto text-center pt-4 mb-4">
 		<h1 id="main-title" class="dark:text-amber-100 text-4xl md:text-5xl font-extrabold text-stone-700 md:mb-8 mb-4">Pick A Park</h1>
 		<div class="geocoder rounded bg-stone-100">
@@ -21,55 +20,75 @@ templ pageIndex(parks []api.Park, placeName string, state string) {
 		@Parks(parks, placeName, state)
 	</div>
 
-	if len(parks) != 0 {
-		<button id="load-more-parks"
-			hx-get={ fmt.Sprintf("/load-more-parks/%s/%s", placeName, state) }
-			hx-target="#parks"
-			hx-swap="beforeend"
-			hx-push-url="false"
-			preload
-			preload-images="true"
-			class="block w-64 mx-auto mb-8 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
-			Load More
-		</button>
-		<div class="flex justify-center">
-		  <p class="dark:text-white max-w-2xl text-sm text-stone-700 text-center mx-8"><span class="dark:text-lime-400 text-lime-800">*</span> Parks are sorted by as-the-crow-flies distance from your location, and thus may not be sorted by driving distance exactly.</p>
-		</div>
-	}
-
 	<script>
+
 	(function() {
-		// Check if Geolocation is supported
-		if (!navigator.geolocation) {
-			console.log("Geolocation is not supported by this browser.");
-			return;
-			// else if path != /
-		} else if (window.location.pathname != '/') {
-			return;
-		}
+        const CACHE_EXPIRATION_HOURS = 1; // set cache expiration time to 1 hour
 
-		// Get current position
-		navigator.geolocation.getCurrentPosition(function(position) {
-			let latitude = position.coords.latitude;
-			let longitude = position.coords.longitude;
+        function getCache() {
+            const cache = localStorage.getItem('locationCache');
+            if (cache) {
+                const parsedCache = JSON.parse(cache);
+                const cacheTime = new Date(parsedCache.timestamp);
+                const currentTime = new Date();
+                // check if the cache has expired
+                if ((currentTime - cacheTime) / (1000 * 60 * 60) < CACHE_EXPIRATION_HOURS) {
+                    return parsedCache;
+                } else {
+                    localStorage.removeItem('locationCache');
+                }
+            }
+            return null;
+        }
 
-			// Use Mapbox Geocoding API to get place name
-			fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?types=place&countries=us&access_token=pk.eyJ1IjoiYm9nenoiLCJhIjoiY2x2MDU0NjBoMWwzYjJqbWpnazlpaGkzbiJ9.DbPQ3cgc-RxyA5vlEW0mdQ`)
-				.then(response => response.json())
-				.then(data => {
-					let placeNameParts = data.features[0].place_name.split(',');
-					let placeName = placeNameParts[0];
-					let state = placeNameParts[1].trim();
-					let url = '/place/' + encodeURIComponent(placeName) + '/' + encodeURIComponent(state);
+        function setCache(placeName, state) {
+            const cache = {
+                placeName: placeName,
+                state: state,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('locationCache', JSON.stringify(cache));
+        }
 
-					// Use HTMX to send coordinates to the server and get parks
-					htmx.ajax('GET', url, {
-						values: {longitude: longitude, latitude: latitude},
-						target: '.htmx-body',
-					});
-				});
-		});
-	})();
+        // check if Geolocation is supported
+        if (!navigator.geolocation) {
+            console.log("Geolocation is not supported by this browser.");
+            return;
+        } else if (window.location.pathname != '/') {
+            return;
+        }
+
+        const cachedLocation = getCache();
+        if (cachedLocation) {
+            // use cached location data
+            const url = '/place/' + encodeURIComponent(cachedLocation.placeName) + '/' + encodeURIComponent(cachedLocation.state);
+            htmx.ajax('GET', url, {
+                source: '#parks-container',
+                target: '#parks-container',
+            });
+        } else {
+            // get current position
+            navigator.geolocation.getCurrentPosition(function(position) {
+                let latitude = position.coords.latitude;
+                let longitude = position.coords.longitude;
+                fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?types=place&countries=us&access_token=pk.eyJ1IjoiYm9nenoiLCJhIjoiY2x2MDU0NjBoMWwzYjJqbWpnazlpaGkzbiJ9.DbPQ3cgc-RxyA5vlEW0mdQ`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let placeNameParts = data.features[0].place_name.split(',');
+                        let placeName = placeNameParts[0];
+                        let state = placeNameParts[1].trim();
+                        let url = '/place/' + encodeURIComponent(placeName) + '/' + encodeURIComponent(state);
+                        // store place name and state in cache
+                        setCache(placeName, state);
+                        htmx.ajax('GET', url, {
+                            values: {longitude: longitude, latitude: latitude},
+                            source: '#parks-container',
+                            target: '#parks-container',
+                        });
+                    });
+            });
+        }
+    })();
 
 	(function() {
 		// Function to load CSS dynamically
@@ -114,7 +133,8 @@ templ pageIndex(parks []api.Park, placeName string, state string) {
 
 				htmx.ajax('GET', url, {
 					values: { longitude: coords[0], latitude: coords[1] },
-					target: '.htmx-body',
+					source: '#parks-container',
+					target: '#parks-container',
 				});
 			});
 		}

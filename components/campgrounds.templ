@@ -131,7 +131,7 @@ templ CampgroundsInfo(park api.Park, campgrounds []api.Campground) {
 				cooperativeGestures: true,
 				style: 'mapbox://styles/mapbox/outdoors-v12?optimize=true',
 				center: [parseFloat(mapDiv.dataset.lon), parseFloat(mapDiv.dataset.lat)],
-				minZoom: 5,
+				minZoom: 7,
 			});
 			map.on('load', function() {
 				processMarkers(markers, map);
@@ -149,9 +149,9 @@ templ CampgroundsInfo(park api.Park, campgrounds []api.Campground) {
 		function adjustMapView(coords, map) {
 			if (coords.length > 1) {
 				const bounds = coords.reduce((bounds, coord) => bounds.extend(coord), new mapboxgl.LngLatBounds(coords[0], coords[0]));
-				map.fitBounds(bounds, { padding: 50 });
+				map.fitBounds(bounds, { padding: 75 });
 			} else if (coords.length === 1) {
-				map.flyTo({ center: coords[0], zoom: 13 });
+				map.flyTo({ center: coords[0] });
 			}
 		}
 
