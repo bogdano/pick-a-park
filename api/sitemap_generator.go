@@ -44,6 +44,10 @@ func GenerateSitemap(app *pocketbase.PocketBase) {
 	}
 
 	sitemap += `</urlset>`
-	// create sitemap.xml file in project root
-	err = os.WriteFile("sitemap.xml", []byte(sitemap), 0644)
+	// create sitemap.xml file in pb_public
+	err = os.WriteFile("pb_public/sitemap.xml", []byte(sitemap), 0644)
+	if err != nil {
+		log.Printf("Error writing sitemap.xml: %v", err)
+		return
+	}
 }
