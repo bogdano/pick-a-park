@@ -86,11 +86,11 @@ templ CampgroundsInfo(park api.Park, campgrounds []api.Campground) {
 				   class={ "dark:bg-opacity-10 dark:bg-amber-500 dark:border-amber-600 dark:hover:bg-opacity-20 hover:bg-amber-200 border border-amber-300 mx-5 flex justify-between items-center p-4 rounded-2xl mb-4 cursor-pointer group bg-amber-100", templ.KV("dark:bg-green-500 dark:border-green-500 border-green-300 hover:bg-green-200 bg-green-100", campground.FirstComeFirstServe != "0") }>
                     <div class="flex flex-col">
 						<p class={ "dark:text-amber-50 text-amber-700 font-bold text-xl", templ.KV("text-green-700", campground.FirstComeFirstServe != "0") }>{ strings.ToUpper(campground.Name) }</p>
-						<p class="dark:text-amber-50 text-sm mb-2">{ campground.Description }...</p>
+						<p class="dark:text-amber-50 mb-2">{ campground.Description }...</p>
 						if campground.FirstComeFirstServe != "0" {
-							<p class="dark:text-lime-500 text-lime-700 font-bold text-xs">has first-come-first-served spots</p>
+							<p class="dark:text-lime-500 text-lime-700 font-bold text-sm">has first-come-first-served spots</p>
 						} else {
-							<p class="dark:text-amber-500 text-amber-700 font-bold text-xs">reservations required</p>
+							<p class="dark:text-amber-500 text-amber-700 font-bold text-sm">reservations required</p>
 						}
 					</div>
 					<svg class="w-12 h-12 md:h-7 md:w-7 dark:text-amber-100" stroke="currentColor" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

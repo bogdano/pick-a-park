@@ -18,7 +18,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/labstack/echo/v5"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/forms"
 	"github.com/pocketbase/pocketbase/models"
@@ -594,40 +593,4 @@ func FetchAlerts(app *pocketbase.PocketBase) error {
 		}
 	}
 	return nil
-}
-
-func FetchAlertsHTTP(app *pocketbase.PocketBase) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		log.Printf("=============== FETCHING ALERTS DATA ===============")
-		err := FetchAlerts(app)
-		if err != nil {
-			return c.String(http.StatusInternalServerError, err.Error())
-		}
-		log.Printf("============= Alerts data has been stored successfully. ==============")
-		return c.String(http.StatusOK, "Alerts data has been stored successfully.")
-	}
-}
-
-func FetchAndStoreWeatherHTTP(app *pocketbase.PocketBase) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		log.Printf("=============== FETCHING WEATHER DATA ===============")
-		err := FetchAndStoreWeather(app)
-		if err != nil {
-			return c.String(http.StatusInternalServerError, err.Error())
-		}
-		log.Printf("============= Weather data has been stored successfully. ==============")
-		return c.String(http.StatusOK, "Weather data has been stored successfully.")
-	}
-}
-
-func FetchAndStoreNationalParksHTTP(app *pocketbase.PocketBase) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		log.Printf("=============== FETCHING NATIONAL PARKS DATA ===============")
-		err := FetchAndStoreNationalParks(app)
-		if err != nil {
-			return c.String(http.StatusInternalServerError, err.Error())
-		}
-		log.Printf("============= National Parks data has been stored successfully. ==============")
-		return c.String(http.StatusOK, "National Parks data has been stored successfully.")
-	}
 }

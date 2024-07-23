@@ -58,11 +58,11 @@ templ CampgroundInfo(campground api.Campground, parkName string, Id string) {
 		</div>
 	}
 	if campground.DirectionsOverview != "" {
-		<p class="dark:text-amber-50 max-w-2xl mx-5 md:mx-auto mb-8 text-sm text-center text-stone-500 font-bold break-words">{ campground.DirectionsOverview }</p>
+		<p class="dark:text-amber-50 max-w-2xl mx-5 md:mx-auto mb-8 text-center text-stone-600 font-bold break-words">{ campground.DirectionsOverview }</p>
 	}
 
 	<p class="dark:text-amber-100 max-w-3xl mx-5 md:mx-auto mb-2 text-xl text-center text-stone-700 font-bold">DESCRIPTION</p>
-	<p class="dark:text-amber-50 max-w-3xl mx-5 md:mx-auto mb-8 text-base text-center text-stone-700 break-words">{ campground.Description }</p>
+	<p class="dark:text-amber-50 max-w-3xl mx-5 md:mx-auto mb-8 text-lg text-center text-stone-700 break-words">{ campground.Description }</p>
 
 	<div class="flex space-x-4 justify-center mb-8">
 		<div class="dark:bg-amber-700 dark:bg-opacity-80 dark:text-amber-100 bg-amber-100 text-amber-800 w-40 h-40 rounded-2xl flex flex-col justify-center items-center p-4">
@@ -83,7 +83,7 @@ templ CampgroundInfo(campground api.Campground, parkName string, Id string) {
 
 	if campground.WeatherOverview != "" {
 		<p class="dark:text-amber-100 max-w-3xl mx-5 md:mx-auto mb-2 text-xl text-center text-stone-700 font-bold">WEATHER INFO</p>
-		<p class="dark:text-amber-50 max-w-3xl mx-5 md:mx-auto mb-8 text-base text-center text-stone-700 break-words">{ campground.WeatherOverview }</p>
+		<p class="dark:text-amber-50 max-w-3xl mx-5 md:mx-auto mb-8 text-lg text-center text-stone-700 break-words">{ campground.WeatherOverview }</p>
 	}
 
 	if len(campground.Images) > 0 {
@@ -120,7 +120,7 @@ templ CampgroundInfo(campground api.Campground, parkName string, Id string) {
 
 	if campground.ReservationInfo != "" {
 		<p class="dark:text-amber-100 max-w-3xl mx-5 md:mx-auto mb-2 text-xl text-center text-stone-700 font-bold">RESERVATIONS INFO</p>
-		<p class="dark:text-amber-50 max-w-3xl mx-5 md:mx-auto mb-8 text-base text-center text-stone-700 break-words">{ campground.ReservationInfo }</p>
+		<p class="dark:text-amber-50 max-w-3xl mx-5 md:mx-auto mb-8 text-lg text-center text-stone-700 break-words">{ campground.ReservationInfo }</p>
 		if campground.ReservationURL != "" {
 			<a  href={ templ.SafeURL(fmt.Sprint(campground.ReservationURL))} target="_blank"
 				class="do-not-prerender flex flex-row items-center justify-center w-64 mx-auto mb-24 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">

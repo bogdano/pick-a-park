@@ -4,7 +4,7 @@ importScripts('https://storage.googleapis.com/workbox-cdn/releases/7.1.0/workbox
 //   debug: true
 // });
 
-revision = '0.2';
+revision = '0.3';
 
 const FALLBACK_HTML_URL = {url:'/offline', revision: revision};
 const ASSETS = [
