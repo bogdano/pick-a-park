@@ -3,7 +3,7 @@
 
 A learning exercise in Go programming, this project was inspired by the hours I spent trying to pick a national park for a roadtrip during spring break, while I was studying in the US. In mid-March most of the parks around me were still too cold for a longer camping trip, and so I would spend hours cross-referencing the weather at the parks and trying to pick the closest one that my sleeping bag could handle.
 
-The app was built using the [National Park Service API](https://www.nps.gov/subjects/developer/api-documentation.htm), the [OpenWeatherMap API](https://openweathermap.org/api), and the [Mapbox API](https://www.mapbox.com/).
+The app uses data from the [National Park Service API](https://www.nps.gov/subjects/developer/api-documentation.htm), the [OpenWeatherMap API](https://openweathermap.org/api), and the [Mapbox API](https://www.mapbox.com/).
 
 Most of the **Go** code deals with wrangling the data from the NPS API. Their images are 10MB+ in size, and so one of the primary tasks was to resize and compress them before storing them in my DB, in an efficient way. Other optimizations include storing certain responses in my DB as JSON strings, minimizing the number of queries to the Mapbox API by using the Haversine function to narrow down parks within a certain radius of the coordinates provided by the browser's Geolocation API, and storing certain responses in localstorage.
 
