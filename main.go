@@ -85,8 +85,13 @@ func main() {
 	// serves static files from the provided public dir (if exists)
 	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
 		template.NewTemplateRenderer(e.Router)
+
 		// set to ./pb_public when running locally
 		e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS("pb_public"), false))
+
+		app.OnBeforeApiError().Add(func(e *core.ApiErrorEvent) error {
+			return template.Html(e.HttpContext, components.Error(e.Error))
+		})
 
 		e.Router.GET("/", func(c echo.Context) error {
 			parks := []api.Park{}
@@ -263,7 +268,7 @@ func main() {
 					return template.Html(c, components.Campground(campground, parkName, Id))
 				}
 			}
-			return template.Html(c, components.Error(404, "Campground not found"))
+			return c.Redirect(http.StatusFound, "/")
 		})
 
 		e.Router.GET("/place/:placeName/:stateName", func(c echo.Context) error {

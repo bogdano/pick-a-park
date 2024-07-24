@@ -1,15 +1,13 @@
 package components;
 
-templ Error(code int, err string) {
-    @Page("Error | " + err, errorContent(code, err))
+templ Error(err error) {
+    @Page("Error | " + err.Error(), errorContent(err))
 }
 
-templ errorContent(code int, err string) {
-    <div class="h-screen flex justify-center items-center">
-        <div class="flex flex-col items-center">
-                <div class="flex flex-col items-center justify-center gap-4 mb-8">
-                    <h1 id="main-title" class="text-4xl md:text-5xl font-black text-stone-700">{ err }</h1>
-                </div>
+templ errorContent(err error) {
+    <div class="flex justify-center pt-12">
+        <div class="flex flex-col items-center justify-center gap-4 mb-96">
+            <h1 id="main-title" class="text-4xl md:text-5xl font-black text-stone-700 dark:text-white">{ err.Error() }</h1>
         </div>
     </div>
 }

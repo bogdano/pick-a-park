@@ -7,8 +7,7 @@ import (
 
 templ ParkCard(park api.Park, placeName string, stateName string) {
     <a  href={ templ.SafeURL(fmt.Sprintf("/park/%s?q=%s,%s", park.ParkCode, placeName, stateName)) }
-
-        preload="mouseover"
+        preload
         preload-images="true"
         class="park-card cursor-pointer dark:bg-lime-900 dark:text-white bg-amber-50 block group rounded-xl shadow-md w-44 md:w-64 transition-all duration-300 ease-in-out hover:text-white hover:bg-lime-700">
         <div class="flex flex-col">

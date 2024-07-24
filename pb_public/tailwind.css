@@ -1076,6 +1076,10 @@ label {
   margin-bottom: 2rem;
 }
 
+.mb-96 {
+  margin-bottom: 24rem;
+}
+
 .ml-2 {
   margin-left: 0.5rem;
 }
@@ -1178,10 +1182,6 @@ label {
 
 .h-full {
   height: 100%;
-}
-
-.h-screen {
-  height: 100vh;
 }
 
 .min-h-96 {
