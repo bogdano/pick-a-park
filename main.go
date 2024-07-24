@@ -391,6 +391,7 @@ func main() {
 			stateName := c.PathParam("stateName")
 			currentCount, err := strconv.Atoi(c.QueryParam("currentCount"))
 			if err != nil {
+				log.Println(currentCount)
 				return c.String(http.StatusBadRequest, "Invalid currentCount value")
 			}
 			// get all records from nationalParks collection

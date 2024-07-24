@@ -1916,6 +1916,7 @@ label {
 
 .mapboxgl-scroll-zoom-blocker, .mapboxgl-touch-pan-blocker {
   transition-delay: 0s !important;
+  transition: opacity 0.25s ease-in-out !important;
 }
 
 .sedan-sc-regular {

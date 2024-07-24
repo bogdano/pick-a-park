@@ -158,6 +158,7 @@ templ PageIndex(parks []api.Park, placeName string, state string) {
 
 	// update the currentCount in load more button
 	document.addEventListener('htmx:configRequest', function(event) {
+	   // ADD CHECK ON HX-PRELOAD HEADER-- MODIFY HTMX-PRELOAD.JS
 		let currentCount = document.querySelectorAll('#parks .park-card').length;
 		let url = event.detail.path
 		// if the hx-get url is load-more-parks, add currentCount to the url
@@ -165,7 +166,9 @@ templ PageIndex(parks []api.Park, placeName string, state string) {
     		if (typeof currentCount !== 'undefined' && window.location.pathname.startsWith('/place/')) {
     			if (currentCount >= 32 || currentCount == 0) {
     				// hide the button
-    				document.getElementById('load-more-parks').style.display = 'none';
+              		if (!event.detail.headers['hx-preload']) {
+                        document.getElementById('load-more-parks').style.display = 'none';
+                    }
     			}
     		}
 			event.detail.parameters.currentCount = currentCount;

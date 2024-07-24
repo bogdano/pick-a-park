@@ -152,7 +152,8 @@ templ CampgroundsInfo(park api.Park, campgrounds []api.Campground) {
 				const bounds = coords.reduce((bounds, coord) => bounds.extend(coord), new mapboxgl.LngLatBounds(coords[0], coords[0]));
 				map.fitBounds(bounds, { padding: 75 });
 			} else if (coords.length === 1) {
-				map.flyTo({ center: coords[0] });
+				map.setCenter(coords[0]);
+				map.setZoom(14);
 			}
 		}
 
