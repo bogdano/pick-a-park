@@ -50,10 +50,15 @@ templ CampgroundInfo(campground api.Campground, parkName string, Id string) {
 	</div>
 
 	if campground.MapImage != "" {
-		<div class="max-w-3xl mx-5 mb-4 md:mx-auto h-96 rounded-2xl bg-stone-200 dark:bg-stone-500 relative overflow-hidden">
-			<img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/cnpa06hb04mppdu/%s/%s", Id, campground.MapImage)))} alt="campground map" class="w-full h-full rounded-2xl object-cover object-center" loading="lazy" />
-    		<a href={ templ.SafeURL(fmt.Sprintf("https://www.google.com/maps/search/?api=1&query=%s,%s", campground.Latitude, campground.Longitude))} target="blank" class="do-not-prerender absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 rounded-2xl transition-opacity cursor-pointer flex justify-center items-center group">
-				<img src="/gmaps.svg" alt="Camp Location" class="opacity-0 group-hover:opacity-100 w-20 h-20" />
+		<div class="group max-w-3xl mx-5 mb-4 md:mx-auto h-96 rounded-2xl bg-stone-200 dark:bg-stone-500 relative overflow-hidden">
+			<img src={ string(templ.SafeURL(fmt.Sprintf("/api/files/cnpa06hb04mppdu/%s/%s", Id, campground.MapImage)))}
+			     alt="campground map"
+				 class="w-full h-full rounded-2xl object-cover object-center group-hover:border-2 border-lime-600"
+				 loading="lazy" />
+    		<a href={ templ.SafeURL(fmt.Sprintf("https://www.google.com/maps/search/?api=1&query=%s,%s", campground.Latitude, campground.Longitude))}
+                target="blank"
+                class="absolute inset-0 cursor-pointer flex justify-end items-end">
+				<img src="/gmaps.svg" alt="Camp Location" class="transition-opacity opacity-0 group-hover:opacity-100 m-5 w-16 h-16" />
 			</a>
 		</div>
 	}

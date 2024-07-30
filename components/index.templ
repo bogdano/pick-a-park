@@ -166,7 +166,7 @@ templ PageIndex(parks []api.Park, placeName string, state string) {
     		if (typeof currentCount !== 'undefined' && window.location.pathname.startsWith('/place/')) {
     			if (currentCount >= 32 || currentCount == 0) {
     				// hide the button
-              		if (!event.detail.headers['hx-preload']) {
+              		if (!event.detail.headers['HX-Preload']) {
                         document.getElementById('load-more-parks').style.display = 'none';
                     }
     			}

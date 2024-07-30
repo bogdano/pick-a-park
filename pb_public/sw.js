@@ -4,7 +4,7 @@ importScripts('https://storage.googleapis.com/workbox-cdn/releases/7.1.0/workbox
 //   debug: true
 // });
 
-revision = '0.3';
+revision = '0.4';
 
 const FALLBACK_HTML_URL = {url:'/offline', revision: revision};
 const ASSETS = [
@@ -17,7 +17,7 @@ const ASSETS = [
   { url:'/mapbox-gl-geocoder.min.js', revision: revision },
   { url:'/mapbox-gl.js', revision: revision },
   { url:'/blaze-slider.min.js', revision: revision },
-  { url:'/htmx-preload.min.js', revision: revision },
+  { url:'/preload.js', revision: revision },
 ];
 
 // Precache all assets

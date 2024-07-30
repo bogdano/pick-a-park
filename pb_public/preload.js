@@ -47,7 +47,7 @@ htmx.defineExtension('preload', {
         if (hxGet) {
           htmx.ajax('GET', hxGet, {
             source: node,
-            headers: { 'hx-preload': 'true' },
+            headers: { 'HX-Preload': 'true' },
             handler: function(elt, info) {
               done(info.xhr.responseText)
             }
@@ -61,8 +61,8 @@ htmx.defineExtension('preload', {
         if (node.getAttribute('href')) {
           var r = new XMLHttpRequest()
           r.open('GET', node.getAttribute('href'))
-          r.setRequestHeader('hx-preload', 'true')
-          r.setRequestHeader('hx-request', 'true')
+          r.setRequestHeader('HX-Preload', 'true')
+          r.setRequestHeader('HX-Request', 'true')
           r.onload = function() { done(r.responseText) }
           r.send()
         }

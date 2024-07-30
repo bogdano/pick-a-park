@@ -175,7 +175,7 @@ func main() {
 					}
 				}
 				// if contains hx-request header:
-				if c.Request().Header.Get("hx-request") == "true" {
+				if c.Request().Header.Get("HX-Request") == "true" {
 					return template.Html(c, components.ParkInfo(park, placeName, alerts))
 				} else {
 					return template.Html(c, components.Park(park, placeName, alerts))
@@ -222,7 +222,7 @@ func main() {
 					ParkCode:     parkCode,
 				}
 				// if contains hx-request header:
-				if c.Request().Header.Get("hx-request") == "true" {
+				if c.Request().Header.Get("HX-Request") == "true" {
 					return template.Html(c, components.CampgroundsInfo(park, campgrounds))
 				} else {
 					return template.Html(c, components.Campgrounds(park, campgrounds))
@@ -262,7 +262,7 @@ func main() {
 				parkName := park.GetString("name")
 				Id := campgroundRecord.Id
 				// if contains hx-request header:
-				if c.Request().Header.Get("hx-request") == "true" {
+				if c.Request().Header.Get("HX-Request") == "true" {
 					return template.Html(c, components.CampgroundInfo(campground, parkName, Id))
 				} else {
 					return template.Html(c, components.Campground(campground, parkName, Id))
@@ -306,7 +306,7 @@ func main() {
 					parks = append(parks, park)
 				}
 				// return all info from DB
-				if c.Request().Header.Get("hx-request") == "true" {
+				if c.Request().Header.Get("HX-Request") == "true" {
 					c.Response().Header().Set("HX-Push-Url", "/place/"+placeName+"/"+stateName)
 					return template.Html(c, components.Parks(parks, placeName, stateName))
 				} else {
@@ -377,7 +377,7 @@ func main() {
 						return err
 					}
 				}
-				if c.Request().Header.Get("hx-request") == "true" {
+				if c.Request().Header.Get("HX-Request") == "true" {
 					c.Response().Header().Set("HX-Push-Url", "/place/"+placeName+"/"+stateName)
 					return template.Html(c, components.Parks(parks, placeName, stateName))
 				} else {

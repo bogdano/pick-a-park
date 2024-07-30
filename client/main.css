@@ -50,7 +50,7 @@
     animation: 0ms ease-out both fade-out;
 }
 ::view-transition-new(smooth-fade) {
-    animation: 250ms ease-out both fade-in;
+    animation: 250ms ease-out 50ms both fade-in;
 }
 ::view-transition-group(*) {
   animation: none;

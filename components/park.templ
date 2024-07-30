@@ -188,8 +188,14 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 	if park.Campgrounds > 0 {
 		<a 	href={ templ.SafeURL(fmt.Sprintf("/campgrounds/%s", park.ParkCode)) }
 			preload="mouseover"
-			class="block w-72 mx-auto mb-12 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
-			View Campgrounds
+			class="flex flex-row w-72 mx-auto shadow-md mb-12 p-4 text-lg justify-center align-middle font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
+			<svg class="w-6 h-6 mr-2 fill-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 297.136 297.136" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 297.136 297.136">
+                <g>
+                    <path d="m232.515,264.944l-28.297-8.784 28.131-8.732c8.664-2.823 13.4-12.137 10.578-20.8-2.824-8.665-12.137-13.4-20.801-10.577l-73.559,22.834-73.558-22.835c-8.664-2.823-17.977,1.912-20.801,10.577-2.822,8.663 1.914,17.977 10.578,20.8l28.131,8.732-28.297,8.784c-8.664,2.822-13.4,12.136-10.576,20.799 2.822,8.664 12.135,13.4 20.799,10.577l73.725-22.886 73.725,22.886c8.664,2.823 17.977-1.913 20.799-10.577 2.824-8.663-1.913-17.976-10.577-20.798z"/>
+                    <path d="m121.648,209.237c0-40.52 27.011-79.78 27.011-79.78s27.017,39.26 27.017,79.78c79.605,0 75.389-79.648 56.217-120.303-4.033-8.553-15.586-10.06-21.662-2.817-15.578,18.572-34.005,29.066-34.005,29.066s14.598-42.873-14.38-86.78c-8.439-12.789-21.273-21.456-32.278-26.998-8.696-4.379-18.991,2.018-18.813,11.754 0.755,41.521-29.282,66.196-43.839,88.024-27.014,40.521-13.509,108.054 54.732,108.054z"/>
+                </g>
+            </svg>
+			<span>View Campgrounds</span>
 		</a>
 	}
 
