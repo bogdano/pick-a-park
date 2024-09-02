@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url><loc>https://pick-a-park.com/</loc></url>
 <url><loc>https://pick-a-park.com/park/acad</loc></url>
 <url><loc>https://pick-a-park.com/campgrounds/acad</loc></url>
 <url><loc>https://pick-a-park.com/park/arch</loc></url>
@@ -398,4 +399,5 @@
 <url><loc>https://pick-a-park.com/place/Palmetto/Florida</loc></url>
 <url><loc>https://pick-a-park.com/place/Bear/Delaware</loc></url>
 <url><loc>https://pick-a-park.com/place/Mountain%20View/California</loc></url>
+<url><loc>https://pick-a-park.com/place/Anchorage/Alaska</loc></url>
 </urlset>

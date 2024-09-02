@@ -8,15 +8,16 @@ import (
 	"github.com/pocketbase/pocketbase"
 )
 
-func GenerateSitemap(app *pocketbase.PocketBase) {
+func GenerateSitemap(app *pocketbase.PocketBase) (error) {
 	// Generate sitemap.xml
 	var sitemap string
 	sitemap += `<?xml version="1.0" encoding="UTF-8"?>` + "\n"
 	sitemap += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">` + "\n"
+	sitemap += `<url><loc>https://pick-a-park.com/</loc></url>` + "\n"
 	parks, err := app.Dao().FindRecordsByExpr("nationalParks")
 	if err != nil {
 		log.Printf("Error fetching national parks: %v", err)
-		return
+		return err
 	}
 	for _, park := range parks {
 		sitemap += `<url><loc>https://pick-a-park.com/park/` + park.GetString("parkCode") + `</loc></url>` + "\n"
@@ -25,7 +26,7 @@ func GenerateSitemap(app *pocketbase.PocketBase) {
 	campgrounds, err := app.Dao().FindRecordsByExpr("campgrounds")
 	if err != nil {
 		log.Printf("Error fetching campgrounds: %v", err)
-		return
+		return err
 	}
 	for _, campground := range campgrounds {
 		sitemap += `<url><loc>https://pick-a-park.com/campground/` + campground.GetString("campId") + `</loc></url>` + "\n"
@@ -34,7 +35,7 @@ func GenerateSitemap(app *pocketbase.PocketBase) {
 	places, err := app.Dao().FindRecordsByExpr("uniquePlaces")
 	if err != nil {
 		log.Printf("Error fetching places: %v", err)
-		return
+		return err
 	}
 	for _, place := range places {
 		placeName := strings.Split(place.GetString("placeName"), ",")
@@ -48,6 +49,7 @@ func GenerateSitemap(app *pocketbase.PocketBase) {
 	err = os.WriteFile("pb_public/sitemap.xml", []byte(sitemap), 0644)
 	if err != nil {
 		log.Printf("Error writing sitemap.xml: %v", err)
-		return
+		return err
 	}
+	return nil
 }

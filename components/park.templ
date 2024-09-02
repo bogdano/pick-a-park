@@ -139,9 +139,9 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 	</div>
 	<span class="text-stone-500 text-xs text-center w-full block font-bold mb-8">last updated: { lastUpdated(park.Weather[0].LastUpdated) }</span>
 
-	<p class="dark:text-amber-100 max-w-3xl mx-5 md:mx-auto mb-4 text-xl text-center text-stone-700 font-bold">DIRECTIONS INFO</p>
+	<p class="dark:text-amber-100 max-w-3xl mx-5 md:mx-auto text-xl text-center text-stone-700 font-bold">DIRECTIONS INFO</p>
 	if placeName != "" {
-		<div id="directions" class="group bg-lime-700 text-white font-mono max-w-3xl mx-auto md:rounded-2xl px-8 py-6 mb-4 relative overflow-hidden">
+		<div id="directions" class="group bg-lime-700 text-white font-mono max-w-3xl mx-auto mt-4 md:rounded-2xl px-8 py-6 relative overflow-hidden">
 			<div class="flex flex-col md:flex-row justify-between w-full items-center">
 				<div class="text-center md:text-lg">
 					<span>{ strings.Split(placeName, ",")[0] + ", " + strings.Split(placeName, ",")[1] }</span>
@@ -177,6 +177,7 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 			</div>
 			<a  href={ templ.SafeURL(fmt.Sprintf("/park/%s", park.ParkCode)) }
 			    hx-swap="show:none"
+				preload
 			    aria-label="Hide start location"
 				class="opacity-0 group-hover:opacity-100 absolute right-2 top-2 p-1 rounded-full bg-red-700 hover:bg-red-900">
 				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-4 h-4 fill-current stroke-current">
@@ -185,7 +186,7 @@ templ ParkInfo(park api.Park, placeName string, alerts []api.Alert) {
 			</a>
 		</div>
 	}
-	<div class="dark:text-amber-50 text-center text-stone-700 text-lg max-w-4xl mx-4 md:mx-auto mb-8 break-words">
+	<div class="dark:text-amber-50 text-center text-stone-700 text-lg max-w-4xl mx-4 md:mx-auto mt-4 mb-8 break-words">
 		{park.DirectionsInfo}
 	</div>
 	if park.Campgrounds > 0 {

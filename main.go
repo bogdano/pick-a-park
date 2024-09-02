@@ -78,7 +78,12 @@ func main() {
 	app.RootCmd.AddCommand(&cobra.Command{
 		Use:   "generate-sitemap",
 		Run: func(cmd *cobra.Command, args []string) {
-			api.GenerateSitemap(app)
+			err := api.GenerateSitemap(app)
+			if err != nil {
+				log.Println("Error generating sitemap:", err)
+			} else {
+				log.Println("Sitemap generated!")
+			}
 		},
 	})
 
@@ -514,6 +519,16 @@ func main() {
 				return
 			}
 			log.Println("Alerts data fetched and stored!")
+		})
+		// update sitemap every 24 hours, at 20 minutes past the hour
+		scheduler.MustAdd("updateSitemap", "20 0 * * *", func() {
+			log.Println("Updating sitemap...")
+			err := api.GenerateSitemap(app)
+			if err != nil {
+				log.Println("Error updating sitemap:", err)
+				return
+			}
+			log.Println("Sitemap updated!")
 		})
 		scheduler.Start()
 		return nil
