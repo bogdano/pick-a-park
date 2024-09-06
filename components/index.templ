@@ -16,12 +16,11 @@ templ PageIndex(parks []api.Park, placeName string, state string) {
 		</div>
 	</div>
 
-	<div id="parks-container" class="text-center min-h-96">
+	<div id="parks-container" class="text-center">
 		@Parks(parks, placeName, state)
 	</div>
 
 	<script>
-
 	(function() {
         const CACHE_EXPIRATION_HOURS = 1; // set cache expiration time to 1 hour
 

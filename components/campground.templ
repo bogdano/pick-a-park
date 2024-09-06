@@ -128,7 +128,7 @@ templ CampgroundInfo(campground api.Campground, parkName string, Id string) {
 		<p class="dark:text-amber-50 max-w-3xl mx-5 md:mx-auto mb-8 text-lg text-center text-stone-700 break-words">{ campground.ReservationInfo }</p>
 		if campground.ReservationURL != "" {
 			<a  href={ templ.SafeURL(fmt.Sprint(campground.ReservationURL))} target="_blank"
-				class="do-not-prerender flex flex-row items-center justify-center w-64 mx-auto mb-24 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
+				class="do-not-prerender flex flex-row items-center justify-center w-64 mx-auto mb-12 py-2 px-4 text-lg text-center font-bold text-white bg-lime-700 rounded-2xl hover:bg-lime-800 cursor-pointer">
 				<span class="mr-1">Reserve</span>
 				<svg class="h-5 w-5 text-white" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
 					<g id="Interface / External_Link">
@@ -137,7 +137,7 @@ templ CampgroundInfo(campground api.Campground, parkName string, Id string) {
 				</svg>
 			</a>
 		} else {
-			<div class="mb-24"></div>
+			<div class="mb-12"></div>
 		}
 	}
 

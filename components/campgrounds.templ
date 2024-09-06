@@ -77,7 +77,7 @@ templ CampgroundsInfo(park api.Park, campgrounds []api.Campground) {
 	<!-- mapbox map with all campgrounds -->
 	<div class="max-w-3xl mx-5 mb-8 md:mx-auto h-96 rounded-2xl bg-stone-200" id="map" data-markers={ campToJSON(campgrounds) } data-lat={ park.Latitude } data-lon={ park.Longitude }></div>
 
-    <div class="flex flex-col items-center gap-4 mb-24">
+    <div class="flex flex-col items-center gap-4 mb-12">
         <div class="max-w-3xl mx-auto">
             for _, campground := range campgrounds {
                 <a href={ templ.SafeURL(fmt.Sprintf("/campground/%s", campground.Id)) } id={ fmt.Sprintf("camp-%s", campground.Id) }
