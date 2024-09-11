@@ -4,11 +4,11 @@ import (
 	"go-htmx/api"
 )
 
-templ Index(parks []api.Park, placeName string, state string) {
-	@Page("Pick A Park!", PageIndex(parks, placeName, state))
+templ Index(parks []api.Park, placeName string, state string, isBotRequest bool) {
+	@Page("Pick A Park!", PageIndex(parks, placeName, state, isBotRequest))
 }
 
-templ PageIndex(parks []api.Park, placeName string, state string) {
+templ PageIndex(parks []api.Park, placeName string, state string, isBotRequest bool) {
 	<div class="flex flex-col items-center mx-auto text-center pt-4 mb-4">
 		<h1 id="main-title" class="dark:text-amber-100 text-4xl md:text-5xl font-black text-stone-700">Pick A Park</h1>
 		<div class="geocoder rounded mt-6 bg-stone-100">
@@ -16,14 +16,13 @@ templ PageIndex(parks []api.Park, placeName string, state string) {
 		</div>
 	</div>
 
-	<div id="parks-container" class="text-center">
+	<div id="parks-container" class="text-center" data-request-type={ templ.JSONString(isBotRequest) }>
 		@Parks(parks, placeName, state)
 	</div>
 
 	<script>
 	(function() {
         const CACHE_EXPIRATION_HOURS = 1; // set cache expiration time to 1 hour
-
         function getCache() {
             const cache = localStorage.getItem('locationCache');
             if (cache) {
@@ -47,6 +46,12 @@ templ PageIndex(parks []api.Park, placeName string, state string) {
                 timestamp: new Date().toISOString()
             };
             localStorage.setItem('locationCache', JSON.stringify(cache));
+        }
+
+        let requestType = document.getElementById('parks-container').dataset.requestType;
+        if (requestType == 'true') {
+            // skip geolocation redirect
+            return;
         }
 
         // check if Geolocation is supported

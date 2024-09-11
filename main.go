@@ -102,7 +102,9 @@ func main() {
 			parks := []api.Park{}
 			placeName := ""
 			stateName := ""
-			return template.Html(c, components.Index(parks, placeName, stateName))
+			userAgent := c.Request().UserAgent()
+			isBotRequest := api.IsBot(userAgent)
+			return template.Html(c, components.Index(parks, placeName, stateName, isBotRequest))
 		})
 
 		e.Router.GET("/offline", func(c echo.Context) error {
@@ -315,7 +317,7 @@ func main() {
 					c.Response().Header().Set("HX-Push-Url", "/place/"+placeName+"/"+stateName)
 					return template.Html(c, components.Parks(parks, placeName, stateName))
 				} else {
-					return template.Html(c, components.Index(parks, placeName, stateName))
+					return template.Html(c, components.Index(parks, placeName, stateName, false))
 				}
 			} else {
 				// get all records from nationalParks collection
@@ -386,7 +388,7 @@ func main() {
 					c.Response().Header().Set("HX-Push-Url", "/place/"+placeName+"/"+stateName)
 					return template.Html(c, components.Parks(parks, placeName, stateName))
 				} else {
-					return template.Html(c, components.Index(parks, placeName, stateName))
+					return template.Html(c, components.Index(parks, placeName, stateName, false))
 				}
 			}
 		})

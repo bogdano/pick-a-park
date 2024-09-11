@@ -7,3 +7,4 @@ tailwind.config.js
 .gitignore
 .env
 /node_modules
+/pb_public/sitemap.xml
