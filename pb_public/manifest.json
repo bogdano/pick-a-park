@@ -12,23 +12,23 @@
     "icons": [
         {
             "src": "/android-chrome-192x192.png", "type": "image/png", "sizes": "192x192"
-          }, 
+          },
           {
             "src": "/android-chrome-512x512.png", "type": "image/png", "sizes": "512x512"
           }
     ],
     "screenshots": [
         {
-            "src": "/screenshot-1.png", "type": "image/png", "sizes": "3840x1926", "form_factor": "wide"
+            "src": "/screenshot-1.webp", "type": "image/webp", "sizes": "3840x1926", "form_factor": "wide"
         },
         {
-            "src": "/screenshot-2.png", "type": "image/png", "sizes": "3840x1926", "form_factor": "wide"
+            "src": "/screenshot-2.webp", "type": "image/webp", "sizes": "3840x1926", "form_factor": "wide"
         },
         {
-            "src": "/screenshot-mobile-1.png", "type": "image/png", "sizes": "824x1766"
+            "src": "/screenshot-mobile-1.webp", "type": "image/webp", "sizes": "824x1766"
         },
         {
-            "src": "/screenshot-mobile-2.png", "type": "image/png", "sizes": "824x1766"
+            "src": "/screenshot-mobile-2.webp", "type": "image/webp", "sizes": "824x1766"
         }
     ],
     "dir": "ltr",

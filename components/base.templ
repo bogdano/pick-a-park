@@ -18,7 +18,11 @@ templ head(title string) {
 		<meta property="og:title" content="Pick A Park" />
 		<meta property="og:description" content="An app for discovering National Parks near your location.">
         <meta property="og:url" content="https://pick-a-park.com" />
-        <meta property="og:image" content="/apple-touch-icon.png" />
+        <meta property="og:image" content="/screenshot-2.webp" />
+        <meta property="og:image:width" content="448">
+        <meta property="og:image:height" content="256">
+        <meta property="og:image:alt" content="Pick A Park Logo">
+        <meta property="og:image:type" content="image/webp">
 
 		<link rel="stylesheet" href="/tailwind.css"/>
 		<link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -122,9 +126,9 @@ templ body(component templ.Component) {
      	</div>
       </div>
    	  <footer class="self-end mt-auto w-full">
-   	      <a href="https://bogz.dev/" rel="noopener" class="group flex flex-col justify-center items-center h-20 bg-yellow-100 text-stone-600 dark:bg-stone-800 dark:text-stone-200">
+   	      <a href="https://bogz.dev/projects/pick-a-park" rel="noopener" class="group flex flex-col justify-center items-center h-20 bg-yellow-100 text-stone-600 dark:bg-stone-800 dark:text-stone-200">
             <span class="text-sm">made with ❤️ by <span class="text-amber-700 dark:text-amber-200 group-hover:underline group-hover:font-bold">bogz.dev</span></span>
-            <span class="text-sm font-bold">hire me, please!</span>
+            <span class="text-xs font-bold">hire me, please!</span>
           </a>
       </footer>
 	</body>
