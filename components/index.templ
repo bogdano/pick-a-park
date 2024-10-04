@@ -4,11 +4,11 @@ import (
 	"go-htmx/api"
 )
 
-templ Index(parks []api.Park, placeName string, state string, isBotRequest bool) {
-	@Page("Pick A Park!", PageIndex(parks, placeName, state, isBotRequest))
+templ Index(parks []api.Park, placeName string, state string) {
+	@Page("Pick A Park!", PageIndex(parks, placeName, state))
 }
 
-templ PageIndex(parks []api.Park, placeName string, state string, isBotRequest bool) {
+templ PageIndex(parks []api.Park, placeName string, state string) {
 	<div class="flex flex-col items-center mx-auto text-center pt-4 mb-4">
 		<h1 id="main-title" class="dark:text-amber-100 text-4xl md:text-5xl font-black text-stone-700">Pick A Park</h1>
 		<div class="geocoder rounded mt-6 bg-stone-100">
@@ -16,7 +16,7 @@ templ PageIndex(parks []api.Park, placeName string, state string, isBotRequest b
 		</div>
 	</div>
 
-	<div id="parks-container" class="text-center" data-request-type={ templ.JSONString(isBotRequest) }>
+	<div id="parks-container" class="text-center">
 		@Parks(parks, placeName, state)
 	</div>
 
@@ -46,12 +46,6 @@ templ PageIndex(parks []api.Park, placeName string, state string, isBotRequest b
                 timestamp: new Date().toISOString()
             };
             localStorage.setItem('locationCache', JSON.stringify(cache));
-        }
-
-        let requestType = document.getElementById('parks-container').dataset.requestType;
-        if (requestType == 'true') {
-            // skip geolocation redirect
-            return;
         }
 
         // check if Geolocation is supported
@@ -133,7 +127,7 @@ templ PageIndex(parks []api.Park, placeName string, state string, isBotRequest b
 				const placeNameParts = e.result.place_name.split(',');
 				const placeName = placeNameParts[0];
 				const state = placeNameParts[1].trim();
-				const url = `/place/${encodeURIComponent(placeName)}/${encodeURIComponent(state)}`;
+				const url = `/place/${encodeURIComponent(placeName)}/${encodeURIComponent(state)}/`;
 
 				htmx.ajax('GET', url, {
 					values: { longitude: coords[0], latitude: coords[1] },
